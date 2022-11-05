@@ -10,7 +10,7 @@ add_library( # Sets the name of the library.
         Renderer.cpp
         Renderer.h
         MD2Model.cpp
-        native-lib.cpp
+        Jni.cpp
         ShaderProgram.cpp
         Texture2D.cpp)
 

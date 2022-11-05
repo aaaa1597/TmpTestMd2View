@@ -12,8 +12,8 @@ class MyRenderer : GLSurfaceView.Renderer {
     external fun setRotationAngles(x: Float, y: Float)
     external fun setScale(scale: Float)
 
-    override fun onDrawFrame(gl: GL10?) {
-        Jni.onDrawFrame()
+    override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+        Jni.onSurfaceCreated()
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -21,8 +21,8 @@ class MyRenderer : GLSurfaceView.Renderer {
         gl?.glViewport(0, 0, width, height)
     }
 
-    override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        Jni.onSurfaceCreated()
+    override fun onDrawFrame(gl: GL10?) {
+        Jni.onDrawFrame()
     }
 
     companion object {
