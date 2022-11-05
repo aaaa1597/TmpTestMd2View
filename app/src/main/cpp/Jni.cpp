@@ -1,57 +1,60 @@
 #include <jni.h>
-#include "Renderer.h"
 #include <memory>
+#include <mutex>
+#include <chrono>
+#include "Renderer.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+std::mutex                          gMutex;         /* onStart()完了待ちmutex */
+std::chrono::system_clock::time_point gPreStartTime;/* 前回開始時刻 */
 
 static std::unique_ptr<Raydelto::MD2Loader::Renderer> pRenderer = std::make_unique<Raydelto::MD2Loader::Renderer>();
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCreated(JNIEnv *env, jobject thiz) {
-    pRenderer->OnSurfaceCreated();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceChanged(JNIEnv *env, jobject thiz, jint width, jint height) {
-    pRenderer->OnSurfaceChanged(width, height);
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(JNIEnv *env, jobject thiz) {
-    pRenderer->OnDrawFrame();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_setRotate(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
-    pRenderer->SetRotationAngles(x, y);
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(JNIEnv *env, jobject thiz, jobject assets,
-                                                     jobjectArray modelnames,
-                                                     jobjectArray md2filenames,
-                                                     jobjectArray texfilenames,
-                                                     jobjectArray vshfilenames,
-                                                     jobjectArray fshfilenames) {
+/* onStart */
+JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(JNIEnv *env, jobject thiz, jobject assets,
+                                                     jobjectArray modelnames, jobjectArray md2filenames, jobjectArray texfilenames,
+                                                     jobjectArray vshfilenames, jobjectArray fshfilenames) {
     return true;
 }
 
-extern "C"
+/* onSurfaceCreated */
+JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCreated(JNIEnv *env, jobject thiz) {
+    pRenderer->OnSurfaceCreated();
+}
+
+/* onSurfaceChanged */
+JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceChanged(JNIEnv *env, jobject thiz, jint width, jint height) {
+    pRenderer->OnSurfaceChanged(width, height);
+}
+
+/* onDrawFrame */
+JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(JNIEnv *env, jobject thiz) {
+    pRenderer->OnDrawFrame();
+}
+
 JNIEXPORT void JNICALL
 Java_com_tks_cppmd2viewer_Jni_00024Companion_onStop(JNIEnv *env, jobject thiz) {
     // TODO: implement onStop()
 }
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_setModelPosition(JNIEnv *env, jobject thiz,
-                                                              jstring modelname, jfloat x, jfloat y,
-                                                              jfloat z) {
+
+/* モデルデータ位置設定 */
+JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setModelPosition(JNIEnv *env, jobject thiz, jstring modelname, jfloat x, jfloat y, jfloat z) {
     // TODO: implement setModelPosition()
 }
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_setScale(JNIEnv *env, jobject thiz, jfloat scale) {
+
+/* モデルデータ拡縮設定 */
+JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setScale(JNIEnv *env, jobject thiz, jfloat scale) {
     pRenderer->SetScale(scale);
 }
+
+/* モデルデータ回転設定 */
+JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setRotate(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
+    pRenderer->SetRotationAngles(x, y);
+}
+
+#ifdef __cplusplus
+};
+#endif

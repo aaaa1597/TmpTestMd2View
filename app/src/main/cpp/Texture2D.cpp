@@ -1,9 +1,9 @@
-#include "Texture2D.h"
 #include <iostream>
 #include <cassert>
+#include <android/log.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
-#include "Logger.h"
+#include "Texture2D.h"
 
 using namespace Raydelto::MD2Loader;
 using std::string;
@@ -29,7 +29,7 @@ bool Texture2D::LoadTexture(const string &fileName, bool generateMipMaps)
 
 	if (imageData == nullptr)
 	{
-		LOGE("Error loading texture %s\n", fileName.c_str());
+		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "Error loading texture %s %s(%d)", fileName.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 		return false;
 	}
 

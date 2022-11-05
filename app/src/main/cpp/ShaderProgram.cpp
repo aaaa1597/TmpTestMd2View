@@ -1,11 +1,10 @@
 #include "ShaderProgram.h"
+#include <android/log.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
 #include "glm/gtc/type_ptr.hpp"
-
-#include "Logger.h"
 
 using namespace Raydelto::MD2Loader;
 using std::string;
@@ -43,7 +42,7 @@ bool ShaderProgram::LoadShaders(std::string vsFilename, std::string fsFilename)
 	mHandle = glCreateProgram();
 	if (mHandle == 0)
 	{
-		LOGE("Unable to create shader program!");
+		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "Unable to create shader program! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 		return false;
 	}
 
@@ -78,7 +77,7 @@ string ShaderProgram::FileToString(const string &filename)
 	}
 	catch (std::exception &ex)
 	{
-		LOGE("Error reading shader filename!");
+		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "Error reading shader filename! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 	}
 
 	return ss.str();
@@ -107,7 +106,7 @@ void ShaderProgram::CheckCompileErrors(GLuint shader, ShaderType type)
 			// The length includes the NULL character
 			string errorLog(length, ' '); // Resize and fill with space character
 			glGetProgramInfoLog(shader, length, &length, &errorLog[0]);
-			LOGE("Error! Shader program failed to link. %s length %d\n", errorLog.c_str(), length);
+			__android_log_print(ANDROID_LOG_INFO, "aaaaa", "Error! Shader program failed to link. %s length %d %s %s(%d)", errorLog.c_str(), length, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 		}
 	}
 	else
@@ -121,7 +120,7 @@ void ShaderProgram::CheckCompileErrors(GLuint shader, ShaderType type)
 			// The length includes the NULL character
 			string errorLog(length, ' '); // Resize and fill with space character
 			glGetShaderInfoLog(shader, length, &length, &errorLog[0]);
-			LOGE("Error! Shader failed to compile. %s length %d\n", errorLog.c_str(), length);
+			__android_log_print(ANDROID_LOG_INFO, "aaaaa", "Error! Shader failed to compile. %s length %d %s %s(%d)", errorLog.c_str(), length, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 		}
 	}
 }

@@ -1,8 +1,9 @@
+#include <jni.h>
+#include <android/log.h>
+#include "Md2Parts.h"
 #include "MD2Model.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
-#include <jni.h>
-#include <android/log.h>
 
 using namespace Raydelto::MD2Loader;
 
@@ -178,7 +179,7 @@ void MD2Model::LoadModel(std::string md2FileName)
 
 	char *buffer;
 
-	header *head;
+	md2header *head;
 	texindex *stPtrs;
 
 	mesh *bufIndexPtr;
@@ -191,22 +192,22 @@ void MD2Model::LoadModel(std::string md2FileName)
 	buffer = reinterpret_cast<char*>(malloc(length + 1));
 	fread(buffer, sizeof(char), length, fp);
 
-	head = reinterpret_cast<header*>(buffer);
+	head = reinterpret_cast<md2header*>(buffer);
     /* TODO 削除予定 */
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d %s %s(%d)", head->Number_Of_Frames, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d %s %s(%d)", head->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	m_model.reset(reinterpret_cast<modData*>(malloc(sizeof(modData))));
 
-	m_model->vertexList = reinterpret_cast<Raydelto::MD2Loader::vertex*>(malloc(sizeof(Raydelto::MD2Loader::vertex) * head->vNum * head->Number_Of_Frames));
-	m_model->numVertexs = head->vNum;
-	m_model->numFrames = head->Number_Of_Frames;
+	m_model->vertexList = reinterpret_cast<Raydelto::MD2Loader::vertex*>(malloc(sizeof(Raydelto::MD2Loader::vertex) * head->num_vertexs * head->num_totalframes));
+	m_model->numVertexs = head->num_vertexs;
+	m_model->numFrames = head->num_totalframes;
 	m_model->frameSize = head->framesize;
 
-	for (size_t lpct = 0; lpct < head->Number_Of_Frames; lpct++)
+	for (size_t lpct = 0; lpct < head->num_totalframes; lpct++)
 	{
-		frame *fra = (frame *)&buffer[head->offsetFrames + head->framesize * lpct];
-		Raydelto::MD2Loader::vertex *vertexList = (Raydelto::MD2Loader::vertex *)&m_model->vertexList[head->vNum * lpct];
-		for (size_t lpct2 = 0; lpct2 < head->vNum; lpct2++)
+		frame *fra = (frame *)&buffer[head->offset_frames + head->framesize * lpct];
+		Raydelto::MD2Loader::vertex *vertexList = (Raydelto::MD2Loader::vertex *)&m_model->vertexList[head->num_vertexs * lpct];
+		for (size_t lpct2 = 0; lpct2 < head->num_vertexs; lpct2++)
 		{
 			vertexList[lpct2].v[0] = fra->scale[0] * fra->fp[lpct2].v[0] + fra->translate[0];
 			vertexList[lpct2].v[1] = fra->scale[1] * fra->fp[lpct2].v[1] + fra->translate[1];
@@ -216,17 +217,17 @@ void MD2Model::LoadModel(std::string md2FileName)
 
 	m_model->st = reinterpret_cast<textcoord*>(malloc(sizeof(textcoord) * head->num_st));
 	m_model->numST = head->num_st;
-	stPtrs = (texindex *)&buffer[head->offsetTCoord];
+	stPtrs = (texindex *)&buffer[head->offset_st];
 
 	for (size_t count = 0; count < head->num_st; count++)
 	{
-		m_model->st[count].s = static_cast<float>(stPtrs[count].s) / static_cast<float>(head->twidth);
-		m_model->st[count].t = static_cast<float>(stPtrs[count].t) / static_cast<float>(head->theight);
+		m_model->st[count].s = static_cast<float>(stPtrs[count].s) / static_cast<float>(head->skinwidth);
+		m_model->st[count].t = static_cast<float>(stPtrs[count].t) / static_cast<float>(head->skinheight);
 	}
 
 	m_model->polyIndx = reinterpret_cast<mesh*>(malloc(sizeof(mesh) * head->num_polys));
 	m_model->numTriangles = head->num_polys;
-	bufIndexPtr = (mesh *)&buffer[head->offsetMesh];
+	bufIndexPtr = (mesh *)&buffer[head->offset_meshs];
 
 //	for (size_t count = 0; count < head->Number_Of_Frames; count++)
 //	{

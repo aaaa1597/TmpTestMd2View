@@ -17,28 +17,6 @@ namespace Raydelto::MD2Loader
     class ShaderProgram;
     class Texture2D;
 
-    struct header
-    {
-        int id;
-        int version;
-        int twidth;
-        int theight;
-        int framesize;
-        int textures;
-        int vNum;
-        int num_st;
-        int num_polys;
-        int numGLcmds;
-        int Number_Of_Frames;
-
-        int offsetSkins;
-        int offsetTCoord;
-        int offsetMesh;
-        int offsetFrames;
-        int offsetGLcmds;
-        int offsetEnd;
-    };
-
     struct textcoord
     {
         float s;
