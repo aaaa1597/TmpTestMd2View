@@ -10,7 +10,6 @@ class MyRenderer : GLSurfaceView.Renderer {
     // Native functions
     external fun setScreenSize(width: Int, height: Int)
     external fun setRotationAngles(x: Float, y: Float)
-    external fun setScale(scale: Float)
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         Jni.onSurfaceCreated()

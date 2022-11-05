@@ -41,15 +41,6 @@ Java_com_tks_cppmd2viewer_MyRenderer_setRotationAngles(
     pRenderer->SetRotationAngles(x, y);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_MyRenderer_setScale(
-    JNIEnv *env,
-    jobject /* this */,
-    jfloat scale)
-{
-    pRenderer->SetScale(scale);
-}
-
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_tks_cppmd2viewer_Jni_00024Companion_setRotate(JNIEnv *env, jobject thiz,
@@ -83,6 +74,6 @@ Java_com_tks_cppmd2viewer_Jni_00024Companion_setModelPosition(JNIEnv *env, jobje
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_setScale(JNIEnv *env, jobject thiz, jfloat m_scale) {
-    // TODO: implement setScale()
+Java_com_tks_cppmd2viewer_Jni_00024Companion_setScale(JNIEnv *env, jobject thiz, jfloat scale) {
+    pRenderer->SetScale(scale);
 }
