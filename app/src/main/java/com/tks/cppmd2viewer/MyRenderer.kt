@@ -1,5 +1,6 @@
 package com.tks.cppmd2viewer
 
+import android.content.res.AssetManager
 import android.opengl.GLSurfaceView
 import android.util.Log
 import javax.microedition.khronos.egl.EGLConfig
@@ -7,14 +8,12 @@ import javax.microedition.khronos.opengles.GL10
 
 class MyRenderer : GLSurfaceView.Renderer {
     // Native functions
-    private external fun drawFrame()
-    private external fun surfaceCreated()
     external fun setScreenSize(width: Int, height: Int)
     external fun setRotationAngles(x: Float, y: Float)
     external fun setScale(scale: Float)
 
     override fun onDrawFrame(gl: GL10?) {
-        drawFrame()
+        Jni.onDrawFrame()
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -23,7 +22,7 @@ class MyRenderer : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        surfaceCreated()
+        Jni.onSurfaceCreated()
     }
 
     companion object {

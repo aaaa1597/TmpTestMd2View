@@ -9,13 +9,17 @@ import android.view.ScaleGestureDetector
 import android.view.VelocityTracker
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.File
+import java.io.IOException
 import java.io.RandomAccessFile
 import kotlin.math.max
 import kotlin.math.min
 
 
 class MainActivity : AppCompatActivity() {
+    private val mDrwModelNames = ArrayList<String>()
 
     private lateinit var glSurfaceView: GLSurfaceView
 
@@ -107,6 +111,76 @@ class MainActivity : AppCompatActivity() {
         glSurfaceView.setRenderer(renderer)
     }
 
+    override fun onStart() {
+        super.onStart()
+
+        /* モデルindexs */
+        val md2modelindex = HashMap<String, ModelIndex>()
+        /* モデルindexファイルs(model-index.json)を取得 */
+        try {
+            /* indexファイル読込み */
+            val fileInputStream = assets.open("model-index.json")
+            val readBytes = ByteArray(fileInputStream.available())
+            fileInputStream.read(readBytes)
+            val readString = String(readBytes)
+            fileInputStream.close()
+            Log.i("index-content:", readString)
+            /* jsonパース */
+            val jsonObject = JSONObject(readString)
+            /* jsonパース(md2models) */
+            val jsonarray = jsonObject.getJSONArray("md2models")
+            for(lpct in 0..jsonarray.length()-1) {
+                val md2model = jsonarray.getJSONObject(lpct)
+                val mi: ModelIndex = object : ModelIndex() {
+                    init {
+                        modelname = md2model.getString("name")
+                        md2filename = md2model.getString("vertex")
+                        texfilename = md2model.getString("tex")
+                        vshfilename = md2model.getString("vsh")
+                        fshfilename = md2model.getString("fsh")
+                    }
+                }
+                mDrwModelNames.add(mi.modelname!!)
+                md2modelindex[md2model.getString("name")] = mi
+            }
+        }
+        catch(e : IOException) {
+            e.printStackTrace()
+        }
+        catch(e : JSONException) {
+            e.printStackTrace()
+        }
+
+        Log.d("aaaaa", "model数=" + md2modelindex.size)
+        for ((key, value) in md2modelindex) println(
+            key + " => " + value.md2filename + " : " + value.texfilename + " : " + value.vshfilename + " : " + value.fshfilename
+        )
+
+        /* cpp側 初期化 */
+
+        /* cpp側 初期化 */
+        val modelnames = arrayOfNulls<String>(md2modelindex.size)
+        val md2filenames = arrayOfNulls<String>(md2modelindex.size)
+        val texfilenames = arrayOfNulls<String>(md2modelindex.size)
+        val vshfilenames = arrayOfNulls<String>(md2modelindex.size)
+        val fshfilenames = arrayOfNulls<String>(md2modelindex.size)
+        var lpct = 0
+        for ((key, value) in md2modelindex) {
+            modelnames[lpct] = key
+            md2filenames[lpct] = value.md2filename
+            texfilenames[lpct] = value.texfilename
+            vshfilenames[lpct] = value.vshfilename
+            fshfilenames[lpct] = value.fshfilename
+            lpct++
+        }
+        Jni.onStart(applicationContext.resources.assets, modelnames, md2filenames, texfilenames, vshfilenames, fshfilenames)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Jni.onStop()
+    }
+
     private fun extractAsset(assetName: String) {
         val file = File(assetsDirectory + assetName)
         if (file.exists()) {
@@ -163,4 +237,12 @@ class MainActivity : AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 or View.SYSTEM_UI_FLAG_FULLSCREEN)
     }
+}
+
+internal open class ModelIndex {
+    var modelname: String? = null
+    var md2filename: String? = null
+    var texfilename: String? = null
+    var vshfilename: String? = null
+    var fshfilename: String? = null
 }
