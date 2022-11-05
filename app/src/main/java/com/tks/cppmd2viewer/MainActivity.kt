@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                 velocityTracker = velocityTracker ?: VelocityTracker.obtain()
                 // Add a user's movement to the tracker.
                 velocityTracker?.addMovement(event)
-                renderer?.setRotationAngles(0.0f, 0.0f)
+                Jni.setRotate(0.0f, 0.0f)
             }
             MotionEvent.ACTION_MOVE -> {
                 velocityTracker?.apply {
@@ -75,14 +75,14 @@ class MainActivity : AppCompatActivity() {
                     // computeCurrentVelocity(). Then call getXVelocity()
                     // and getYVelocity() to retrieve the velocity for each pointer ID.
                     computeCurrentVelocity(2)
-                    renderer?.setRotationAngles(getXVelocity(pointerId), getYVelocity(pointerId))
+                    Jni.setRotate(getXVelocity(pointerId), getYVelocity(pointerId))
                 }
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 // Return a VelocityTracker object back to be re-used by others.
                 velocityTracker?.recycle()
                 velocityTracker = null
-                renderer?.setRotationAngles(0.0f, 0.0f)
+                Jni.setRotate(0.0f, 0.0f)
             }
         }
         return true

@@ -9,7 +9,6 @@ import javax.microedition.khronos.opengles.GL10
 class MyRenderer : GLSurfaceView.Renderer {
     // Native functions
     external fun setScreenSize(width: Int, height: Int)
-    external fun setRotationAngles(x: Float, y: Float)
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         Jni.onSurfaceCreated()

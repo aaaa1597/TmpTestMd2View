@@ -31,22 +31,10 @@ Java_com_tks_cppmd2viewer_MyRenderer_setScreenSize(
     pRenderer->SetScreenSize(width, height);
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_MyRenderer_setRotationAngles(
-    JNIEnv *env,
-    jobject /* this */,
-    jfloat x,
-    jfloat y)
-{
-    pRenderer->SetRotationAngles(x, y);
-}
-
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_Jni_00024Companion_setRotate(JNIEnv *env, jobject thiz,
-                                                       jfloat m_touch_angle_x,
-                                                       jfloat m_touch_angle_y) {
-    // TODO: implement setRotate()
+Java_com_tks_cppmd2viewer_Jni_00024Companion_setRotate(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
+    pRenderer->SetRotationAngles(x, y);
 }
 
 extern "C"
