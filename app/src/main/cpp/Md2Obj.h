@@ -74,14 +74,12 @@ public:
     int                 mWkHeight= 0;
     std::vector<char>   mWkRgbaData = {0};
     /* 描画に必要なデータ */
-    MdlData             m_model = {};
     MdlData                 mMdlData = {0};
     glm::vec3 m_position = glm::vec3(0.0f, 0.0f, -25.0f);
     /* アニメ関連 */
     std::unordered_map<int, std::pair<int, int>> m_frameIndices = {};
     /* テクスチャ関連 */
     Texture2D           m_texture = {};
-    bool m_modelLoaded = false;
     bool m_textureLoaded = false;
     bool m_bufferInitialized = false;
     /* シェーダー関連 */

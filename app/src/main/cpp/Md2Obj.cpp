@@ -9,7 +9,7 @@ static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	LoadModel(BASE_PATH + std::string(md2FileName));
+//	LoadModel(BASE_PATH + std::string(md2FileName));
 	LoadTexture(BASE_PATH + std::string(textureFileName));
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
@@ -31,7 +31,7 @@ Md2Model::~Md2Model()
 void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection)
 {
 	glEnable(GL_DEPTH_TEST);
-	assert(m_modelLoaded && m_textureLoaded && m_bufferInitialized);
+	assert(m_textureLoaded && m_bufferInitialized);
 	m_texture.Bind(0);
 	glm::mat4 model;
 
@@ -75,7 +75,7 @@ void Md2Model::LoadTexture(std::string textureFileName)
 
 size_t Md2Model::GetEndFrame()
 {
-	return m_model.numTotalFrames - 1;
+	return mMdlData.numTotalFrames - 1;
 }
 
 void Md2Model::InitBuffer()
@@ -89,21 +89,21 @@ void Md2Model::InitBuffer()
 	size_t endFrame = GetEndFrame();
 	vertex *currentFrame;
 	vertex *nextFrame;
-	m_model.currentFrame = startFrame;
-	m_model.interpol = 0.0f;
+	mMdlData.currentFrame = startFrame;
+	mMdlData.interpol = 0.0f;
 
 	size_t vertexIndex = 0;
 	size_t startVertex = 0;
 
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d numPoly=%d numVertexsperframe=%d %s %s(%d)", endFrame, m_model.numPolys, m_model.numVertexsPerFrame, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d numPoly=%d numVertexsperframe=%d %s %s(%d)", endFrame, mMdlData.numPolys, mMdlData.numVertexsPerFrame, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	// fill buffer
-	while (m_model.currentFrame <= endFrame)
+	while (mMdlData.currentFrame <= endFrame)
 	{
-		currentFrame = &m_model.vertexList[m_model.numVertexsPerFrame * m_model.currentFrame];
-		nextFrame = m_model.currentFrame == endFrame ? &m_model.vertexList[m_model.numVertexsPerFrame * startFrame] : &m_model.vertexList[m_model.numVertexsPerFrame * (m_model.currentFrame + 1)];
+		currentFrame = &mMdlData.vertexList[mMdlData.numVertexsPerFrame * mMdlData.currentFrame];
+		nextFrame = mMdlData.currentFrame == endFrame ? &mMdlData.vertexList[mMdlData.numVertexsPerFrame * startFrame] : &mMdlData.vertexList[mMdlData.numVertexsPerFrame * (mMdlData.currentFrame + 1)];
 		startVertex = vertexIndex;
-		for (size_t index = 0; index < m_model.numPolys; index++)
+		for (size_t index = 0; index < mMdlData.numPolys; index++)
 		{
 
 			// Start of the vertex data
@@ -113,26 +113,26 @@ void Md2Model::InitBuffer()
 				for (size_t j = 0; j < 3; j++)
 				{
 					// vertices
-					md2Vertices.emplace_back(currentFrame[m_model.polyIndex[index].meshIndex[p]].v[j]);
+					md2Vertices.emplace_back(currentFrame[mMdlData.polyIndex[index].meshIndex[p]].v[j]);
 				}
 
 				// next frame
 				for (size_t j = 0; j < 3; j++)
 				{
 					// vertices
-					md2Vertices.emplace_back(nextFrame[m_model.polyIndex[index].meshIndex[p]].v[j]);
+					md2Vertices.emplace_back(nextFrame[mMdlData.polyIndex[index].meshIndex[p]].v[j]);
 				}
 
 				// tex coords
-				md2Vertices.emplace_back(m_model.st[m_model.polyIndex[index].stIndex[p]].s);
-				md2Vertices.emplace_back(m_model.st[m_model.polyIndex[index].stIndex[p]].t);
+				md2Vertices.emplace_back(mMdlData.st[mMdlData.polyIndex[index].stIndex[p]].s);
+				md2Vertices.emplace_back(mMdlData.st[mMdlData.polyIndex[index].stIndex[p]].t);
 				vertexIndex++;
 			}
 			// End of the vertex data
 		}
 
-		m_frameIndices[m_model.currentFrame] = {startVertex, vertexIndex - 1};
-		m_model.currentFrame++;
+		m_frameIndices[mMdlData.currentFrame] = {startVertex, vertexIndex - 1};
+		mMdlData.currentFrame++;
 	}
 
 	size_t frameIndex = startFrame;
@@ -142,7 +142,7 @@ void Md2Model::InitBuffer()
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "count=%d (m_frameIndices[frameIndex].first * 8)=%d  %s %s(%d)", count, m_frameIndices[frameIndex].first * 8, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVboId);																											   // "bind" or set as the current buffer we are working with
-	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * m_model.numTotalFrames, &md2Vertices[m_frameIndices[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * mMdlData.numTotalFrames, &md2Vertices[m_frameIndices[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
 
 	// Current Frame Position attribute
 	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
@@ -252,19 +252,19 @@ void Md2Model::LoadModel(std::string md2FileName)
     /* TODO 削除予定 */
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d %s %s(%d)", head->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
-    std::vector<vertex>().swap(m_model.vertexList);
-	std::vector<texstcoord>().swap(m_model.st);
-	std::vector<mesh>().swap(m_model.polyIndex);
+    std::vector<vertex>().swap(mMdlData.vertexList);
+	std::vector<texstcoord>().swap(mMdlData.st);
+	std::vector<mesh>().swap(mMdlData.polyIndex);
 
-	m_model.vertexList.resize(head->num_vertexs * head->num_totalframes);
-	m_model.numVertexsPerFrame = head->num_vertexs;
-	m_model.numTotalFrames = head->num_totalframes;
+	mMdlData.numVertexsPerFrame = head->num_vertexs;
+	mMdlData.numTotalFrames = head->num_totalframes;
+
+	mMdlData.vertexList.resize(head->num_vertexs * head->num_totalframes);
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "1frame当り2の頂点数(%d)と総フレーム数(%d) %s %s(%d)", head->num_vertexs, head->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-
 	for (size_t lpct = 0; lpct < head->num_totalframes; lpct++)
 	{
 		frame *fra = (frame *)&buffer[head->offset_frames + head->framesize * lpct];
-		vertex *vertexList = (vertex*)&m_model.vertexList[head->num_vertexs * lpct];
+		vertex *vertexList = (vertex*)&mMdlData.vertexList[head->num_vertexs * lpct];
 		for (size_t lpct2 = 0; lpct2 < head->num_vertexs; lpct2++)
 		{
 			vertexList[lpct2].v[0] = fra->scale[0] * fra->fp[lpct2].v[0] + fra->translate[0];
@@ -273,38 +273,37 @@ void Md2Model::LoadModel(std::string md2FileName)
 		}
 	}
 
-	m_model.st.resize(head->num_st);
+	mMdlData.st.resize(head->num_st);
 	stPtrs = (texindex *)&buffer[head->offset_st];
 
 	for (size_t count = 0; count < head->num_st; count++)
 	{
-		m_model.st[count].s = static_cast<float>(stPtrs[count].s) / static_cast<float>(head->skinwidth);
-		m_model.st[count].t = static_cast<float>(stPtrs[count].t) / static_cast<float>(head->skinheight);
+		mMdlData.st[count].s = static_cast<float>(stPtrs[count].s) / static_cast<float>(head->skinwidth);
+		mMdlData.st[count].t = static_cast<float>(stPtrs[count].t) / static_cast<float>(head->skinheight);
 	}
 
-	m_model.polyIndex.resize(head->num_polys);
-	m_model.numPolys = head->num_polys;
+	mMdlData.polyIndex.resize(head->num_polys);
+	mMdlData.numPolys = head->num_polys;
 	bufIndexPtr = (mesh *)&buffer[head->offset_meshs];
 
 //	for (size_t count = 0; count < head->Number_Of_Frames; count++)
 //	{
 		for (size_t count2 = 0; count2 < head->num_polys; count2++)
 		{
-			m_model.polyIndex[count2].meshIndex[0] = bufIndexPtr[count2].meshIndex[0];
-			m_model.polyIndex[count2].meshIndex[1] = bufIndexPtr[count2].meshIndex[1];
-			m_model.polyIndex[count2].meshIndex[2] = bufIndexPtr[count2].meshIndex[2];
+			mMdlData.polyIndex[count2].meshIndex[0] = bufIndexPtr[count2].meshIndex[0];
+			mMdlData.polyIndex[count2].meshIndex[1] = bufIndexPtr[count2].meshIndex[1];
+			mMdlData.polyIndex[count2].meshIndex[2] = bufIndexPtr[count2].meshIndex[2];
 
-			m_model.polyIndex[count2].stIndex[0] = bufIndexPtr[count2].stIndex[0];
-			m_model.polyIndex[count2].stIndex[1] = bufIndexPtr[count2].stIndex[1];
-			m_model.polyIndex[count2].stIndex[2] = bufIndexPtr[count2].stIndex[2];
+			mMdlData.polyIndex[count2].stIndex[0] = bufIndexPtr[count2].stIndex[0];
+			mMdlData.polyIndex[count2].stIndex[1] = bufIndexPtr[count2].stIndex[1];
+			mMdlData.polyIndex[count2].stIndex[2] = bufIndexPtr[count2].stIndex[2];
 		}
 //	}
 
-	m_model.currentFrame = 0;
-	m_model.nextFrame = 1;
-	m_model.interpol = 0.0;
+	mMdlData.currentFrame = 0;
+	mMdlData.nextFrame = 1;
+	mMdlData.interpol = 0.0;
 
 	fclose(fp);
 	free(buffer);
-	m_modelLoaded = true;
 }
