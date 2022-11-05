@@ -6,7 +6,6 @@
 
 #include "glm/gtc/type_ptr.hpp"
 
-using namespace Raydelto::MD2Loader;
 using std::string;
 
 ShaderProgram::ShaderProgram()

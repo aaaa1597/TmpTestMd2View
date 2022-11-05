@@ -17,10 +17,8 @@
 #define MD2_IDENT   (('2'<<24) + ('P'<<16) + ('D'<<8) + 'I')    /* magic number "IDP2" or 844121161 */
 #define	MD2_VERSION 8                                           /* model version */
 
-namespace Raydelto::MD2Loader
-{
-    class ShaderProgram;
-    class Texture2D;
+class ShaderProgram;
+class Texture2D;
 
 struct MdlData {
     int numTotalFrames;
@@ -76,5 +74,4 @@ private:
     GLuint mTexCoordAttrib= -1;
 };
 
-}
 #endif //CPPMD2VIEWER_MD2OBJ_H

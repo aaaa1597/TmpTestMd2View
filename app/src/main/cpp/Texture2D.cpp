@@ -5,7 +5,6 @@
 #include "stb_image/stb_image.h"
 #include "Texture2D.h"
 
-using namespace Raydelto::MD2Loader;
 using std::string;
 
 Texture2D::Texture2D()

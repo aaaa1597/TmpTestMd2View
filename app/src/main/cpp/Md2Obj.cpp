@@ -5,8 +5,6 @@
 #include "ShaderProgram.h"
 #include "Texture2D.h"
 
-using namespace Raydelto::MD2Loader;
-
 static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 
