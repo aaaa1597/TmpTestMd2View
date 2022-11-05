@@ -106,7 +106,6 @@ class MainActivity : AppCompatActivity() {
         val height = metrics.heightPixels
         val width = metrics.widthPixels
         renderer = MyRenderer()
-        renderer?.setScreenSize(width, height)
         Log.d("aaaaa", "onCreate() width=" + width + " height=" + height)
         glSurfaceView.setRenderer(renderer)
     }

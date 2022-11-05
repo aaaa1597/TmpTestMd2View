@@ -17,9 +17,9 @@ namespace Raydelto::MD2Loader
 
         void OnSurfaceCreated();
 
-        void OnDrawFrame();
+        void OnSurfaceChanged(int width, int height);
 
-        void SetScreenSize(int width, int height);
+        void OnDrawFrame();
 
         void SetRotationAngles(float width, float height);
 

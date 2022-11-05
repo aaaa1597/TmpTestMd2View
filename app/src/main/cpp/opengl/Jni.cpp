@@ -12,23 +12,13 @@ Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCreated(JNIEnv *env, jobje
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceChanged(JNIEnv *env, jobject thiz, jint width, jint height) {
-    pRenderer->SetScreenSize(width, height);
+    pRenderer->OnSurfaceChanged(width, height);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(JNIEnv *env, jobject thiz) {
     pRenderer->OnDrawFrame();
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_tks_cppmd2viewer_MyRenderer_setScreenSize(
-    JNIEnv *env,
-    jobject /* this */,
-    jint width,
-    jint height)
-{
-    pRenderer->SetScreenSize(width, height);
 }
 
 extern "C"
