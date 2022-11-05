@@ -19,6 +19,7 @@ class MyRenderer : GLSurfaceView.Renderer {
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         Log.d("aaaaa", "onSurfaceChanged() width=" + width + "height=" + height)
         gl?.glViewport(0, 0, width, height)
+        Jni.onSurfaceChanged(width, height)
     }
 
     override fun onDrawFrame(gl: GL10?) {
