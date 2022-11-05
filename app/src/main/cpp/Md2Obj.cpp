@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include "Md2Parts.h"
-#include "MD2Model.h"
+#include "Md2Obj.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
 
@@ -10,7 +10,7 @@ using namespace Raydelto::MD2Loader;
 static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 
-MD2Model::MD2Model(const char *md2FileName, const char *textureFileName) : m_texture(std::make_unique<Texture2D>()),
+Md2Model::Md2Model(const char *md2FileName, const char *textureFileName) : m_texture(std::make_unique<Texture2D>()),
 																		   m_shaderProgram(std::make_unique<ShaderProgram>()),
 																		   m_position(glm::vec3(0.0f, 0.0f, -25.0f)),
 																		   m_modelLoaded(false),
@@ -27,12 +27,12 @@ MD2Model::MD2Model(const char *md2FileName, const char *textureFileName) : m_tex
 }
 
 
-void MD2Model::SetPosition(float x, float y, float z)
+void Md2Model::SetPosition(float x, float y, float z)
 {
     m_position = glm::vec3(x,y,z);
 }
 
-MD2Model::~MD2Model()
+Md2Model::~Md2Model()
 {
 	for (size_t i = 0; i < m_vboIndices.size(); i++)
 	{
@@ -40,7 +40,7 @@ MD2Model::~MD2Model()
 	}
 }
 
-void MD2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection)
+void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection)
 {
 	glEnable(GL_DEPTH_TEST);
 	assert(m_modelLoaded && m_textureLoaded && m_bufferInitialized);
@@ -79,18 +79,18 @@ void MD2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
-void MD2Model::LoadTexture(std::string textureFileName)
+void Md2Model::LoadTexture(std::string textureFileName)
 {
 	m_texture->LoadTexture(textureFileName, true);
 	m_textureLoaded = true;
 }
 
-size_t MD2Model::GetEndFrame()
+size_t Md2Model::GetEndFrame()
 {
 	return m_model->numTotalFrames - 1;
 }
 
-void MD2Model::InitBuffer()
+void Md2Model::InitBuffer()
 {
 	m_posAttrib = glGetAttribLocation( m_shaderProgram->GetProgram(), "pos");
 	m_nextPosAttrib = glGetAttribLocation( m_shaderProgram->GetProgram(), "nextPos");
@@ -172,7 +172,7 @@ void MD2Model::InitBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
-void MD2Model::LoadModel(std::string md2FileName)
+void Md2Model::LoadModel(std::string md2FileName)
 {
 	FILE *fp;
 	size_t length;

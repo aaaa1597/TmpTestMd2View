@@ -9,7 +9,7 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         Renderer.cpp
         Renderer.h
-        MD2Model.cpp
+        Md2Obj.cpp
         Jni.cpp
         ShaderProgram.cpp
         Texture2D.cpp)

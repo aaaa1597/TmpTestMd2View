@@ -5,7 +5,7 @@
 #include <GLES2/gl2ext.h>
 #include <math.h>
 #include "glm/glm.hpp"
-#include "MD2Model.h"
+#include "Md2Obj.h"
 #include <memory>
 
 namespace Raydelto::MD2Loader
@@ -26,8 +26,8 @@ namespace Raydelto::MD2Loader
         void SetScale(float scale);
 
     private:
-        std::unique_ptr<MD2Model> m_player;
-        std::unique_ptr<MD2Model> m_player2;
+        std::unique_ptr<Md2Model> m_player;
+        std::unique_ptr<Md2Model> m_player2;
         glm::mat4 m_view;
         glm::mat4 m_projection;
         glm::vec3 m_camPos;
