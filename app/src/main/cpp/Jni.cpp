@@ -115,7 +115,7 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(
 
 /* onSurfaceCreated */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCreated(JNIEnv *env, jobject thiz) {
-    pRenderer->OnSurfaceCreated();
+    pRenderer->OnSurfaceCreated(gMd2Models);
 }
 
 /* onSurfaceChanged */
@@ -125,7 +125,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
 
 /* onDrawFrame */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(JNIEnv *env, jobject thiz) {
-    pRenderer->OnDrawFrame();
+    pRenderer->OnDrawFrame(gMd2Models);
 }
 
 JNIEXPORT void JNICALL

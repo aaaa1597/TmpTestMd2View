@@ -19,19 +19,17 @@ namespace Raydelto::MD2Loader
 
         bool LoadModel(std::map<std::string, Md2Model> &md2models);
 
-        void OnSurfaceCreated();
+        void OnSurfaceCreated(std::map<std::string, Md2Model> &md2models);
 
         void OnSurfaceChanged(int width, int height);
 
-        void OnDrawFrame();
+        void OnDrawFrame(std::map<std::string, Md2Model> &md2models);
 
         void SetRotationAngles(float width, float height);
 
         void SetScale(float scale);
 
     private:
-        std::unique_ptr<Md2Model> m_player;
-        std::unique_ptr<Md2Model> m_player2;
         glm::mat4 m_view;
         glm::mat4 m_projection;
         glm::vec3 m_camPos;

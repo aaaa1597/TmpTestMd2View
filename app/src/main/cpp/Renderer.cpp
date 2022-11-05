@@ -23,13 +23,16 @@ bool Renderer::LoadModel(std::map<std::string, Md2Model> &md2models) {
     return true;
 }
 
-void Renderer::OnSurfaceCreated()
+void Renderer::OnSurfaceCreated(std::map<std::string, Md2Model> &md2models)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    m_player = std::make_unique<Md2Model>(/*"female.md2", "female.tga"*/);
+    Md2Model *m_player = &md2models.at("female");
+    Md2Model *m_player2= &md2models.at("grunt");
+
+//    m_player = std::make_unique<Md2Model>(/*"female.md2", "female.tga"*/);
     m_player->setFileName("female.md2","female.tga");
-    m_player2 = std::make_unique<Md2Model>(/*"grunt.md2", "grunt.tga"*/);
+//    m_player2 = std::make_unique<Md2Model>(/*"grunt.md2", "grunt.tga"*/);
     m_player2->setFileName("grunt.md2","grunt.tga");
     m_player2->SetPosition(0.0f, 6.5f, -25.0f);
 }
@@ -51,10 +54,13 @@ void Renderer::OnSurfaceChanged(int width, int height) {
     m_view = glm::lookAt(m_camPos, m_camPos + m_targetPos, m_up);
 }
 
-void Renderer::OnDrawFrame()
+void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)
 {
 //    std::chrono::system_clock::time_point  start, end; // 型は auto で可
 //    start = std::chrono::system_clock::now(); // 計測開始時間
+
+    Md2Model *m_player = &md2models.at("female");
+    Md2Model *m_player2= &md2models.at("grunt");
 
     static const int START_FRAME = 0;
     static const int END_FRAME = m_player->GetEndFrame();
