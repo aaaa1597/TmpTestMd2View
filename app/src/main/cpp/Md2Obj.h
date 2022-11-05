@@ -57,7 +57,7 @@ public:
     bool LoadTexture();
 
 private:
-    std::tuple<bool, int, int, unsigned char *> LoadTexture(std::string textureFileName);
+    void LoadTexture(std::string textureFileName);
     void InitTexture();
     void InitBuffer();
 

@@ -10,15 +10,7 @@ static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	auto [retbool, w, h, rgbabindata] = LoadTexture(BASE_PATH + std::string(textureFileName));
-	if(retbool) {
-		mWkWidth = w;
-		mWkHeight= h;
-		mWkRgbaData.resize(w*h*4);
-		for(int lpct = 0; lpct < w*h*4; lpct++) {
-			mWkRgbaData[lpct] = rgbabindata[lpct];
-		}
-	}
+	LoadTexture(BASE_PATH + std::string(textureFileName));
 	InitTexture();
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
@@ -76,9 +68,18 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
-std::tuple<bool, int, int, unsigned char *> Md2Model::LoadTexture(std::string textureFileName)
+void Md2Model::LoadTexture(std::string textureFileName)
 {
-	return m_texture.LoadTexture(textureFileName, true);
+	auto [retbool, w, h, rgbabindata] = m_texture.LoadTexture(textureFileName, true);
+	if(retbool) {
+		mWkWidth = w;
+		mWkHeight= h;
+		mWkRgbaData.resize(w*h*4);
+		for(int lpct = 0; lpct < w*h*4; lpct++) {
+			mWkRgbaData[lpct] = rgbabindata[lpct];
+		}
+	}
+	return;
 }
 
 void Md2Model::InitTexture() {
