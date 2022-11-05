@@ -9,7 +9,6 @@ using namespace Raydelto::MD2Loader;
 using std::string;
 
 Texture2D::Texture2D()
-	: mTexture(0)
 {
 }
 

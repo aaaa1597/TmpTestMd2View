@@ -38,7 +38,7 @@ namespace Raydelto::MD2Loader
 		std::string FileToString(const std::string &filename);
 		void CheckCompileErrors(GLuint shader, ShaderType type);
 
-		GLuint mHandle;
+		GLuint mHandle = 0;
 		std::unordered_map<std::string, GLint> mUniformLocations;
 	};
 }

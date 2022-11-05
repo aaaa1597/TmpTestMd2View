@@ -10,7 +10,6 @@ using namespace Raydelto::MD2Loader;
 using std::string;
 
 ShaderProgram::ShaderProgram()
-	: mHandle(0)
 {
 }
 

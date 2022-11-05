@@ -11,6 +11,8 @@
 #include "Md2Parts.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "ShaderProgram.h"
+#include "Texture2D.h"
 
 #define MD2_IDENT   (('2'<<24) + ('P'<<16) + ('D'<<8) + 'I')    /* magic number "IDP2" or 844121161 */
 #define	MD2_VERSION 8                                           /* model version */
@@ -29,9 +31,9 @@ struct MdlData {
     int currentFrame;
     int nextFrame;
     float interpol;
-    vertex *vertexList;
-    texstcoord *st;
-    mesh *polyIndx;
+    vertex *vertexList = nullptr;
+    texstcoord *st = nullptr;
+    mesh *polyIndx = nullptr;
     float x, y, z;
     float nextX, nextY, nextZ;
     float radius;
@@ -54,16 +56,16 @@ private:
     void LoadTexture(std::string textureFileName);
     void InitBuffer();
 
-    std::unique_ptr<ShaderProgram> m_shaderProgram;
+    ShaderProgram       m_shaderProgram;
     std::vector<GLuint> m_vboIndices;
 
     /* 描画に必要なデータ */
-    std::unique_ptr<MdlData> m_model;
+    MdlData             m_model;
     glm::vec3 m_position;
     /* アニメ関連 */
     std::unordered_map<int, std::pair<int, int>> m_frameIndices;
     /* テクスチャ関連 */
-    std::unique_ptr<Texture2D> m_texture;
+    Texture2D           m_texture;
     bool m_modelLoaded;
     bool m_textureLoaded;
     bool m_bufferInitialized;

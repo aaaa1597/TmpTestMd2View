@@ -14,6 +14,6 @@ namespace Raydelto::MD2Loader
 		void Bind(GLuint texUnit = 0) const;
 
 	private:
-		GLuint mTexture;
+		GLuint mTexture = 0;
 	};
 }
