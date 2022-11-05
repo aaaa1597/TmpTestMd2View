@@ -42,7 +42,8 @@ struct MdlData {
 
 class Md2Model {
 public:
-    Md2Model(const char *md2FileName, const char *textureFileName);
+//    Md2Model(const char *md2FileName, const char *textureFileName);
+    void setFileName(const char *md2FileName, const char *textureFileName);
     ~Md2Model();
     // The frame parameter start at 0
     void Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection);
@@ -54,19 +55,19 @@ private:
     void LoadTexture(std::string textureFileName);
     void InitBuffer();
 
-    ShaderProgram       m_shaderProgram;
+    ShaderProgram       m_shaderProgram = {};
     std::vector<GLuint> m_vboIndices;
 
     /* 描画に必要なデータ */
     MdlData             m_model;
-    glm::vec3 m_position;
+    glm::vec3 m_position = glm::vec3(0.0f, 0.0f, -25.0f);
     /* アニメ関連 */
     std::unordered_map<int, std::pair<int, int>> m_frameIndices;
     /* テクスチャ関連 */
     Texture2D           m_texture;
-    bool m_modelLoaded;
-    bool m_textureLoaded;
-    bool m_bufferInitialized;
+    bool m_modelLoaded = false;
+    bool m_textureLoaded = false;
+    bool m_bufferInitialized = false;
     /* シェーダー関連 */
     GLuint mVboId         = -1;
     GLuint mCurPosAttrib  = -1;

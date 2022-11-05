@@ -8,22 +8,29 @@
 static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 
-Md2Model::Md2Model(const char *md2FileName, const char *textureFileName) : m_texture{},
-																		   m_shaderProgram{},
-																		   m_position(glm::vec3(0.0f, 0.0f, -25.0f)),
-																		   m_modelLoaded(false),
-																		   m_textureLoaded(false),
-																		   m_bufferInitialized(false),
-																		   mCurPosAttrib(NULL),
-																		   mNextPosAttrib(NULL),
-																		   mTexCoordAttrib(NULL)
-{
+//Md2Model::Md2Model(const char *md2FileName, const char *textureFileName) : m_texture{},
+//																		   m_shaderProgram{},
+//																		   m_position(glm::vec3(0.0f, 0.0f, -25.0f)),
+//																		   m_modelLoaded(false),
+//																		   m_textureLoaded(false),
+//																		   m_bufferInitialized(false),
+//																		   mCurPosAttrib(NULL),
+//																		   mNextPosAttrib(NULL),
+//																		   mTexCoordAttrib(NULL)
+//{
+//	LoadTexture(BASE_PATH + std::string(textureFileName));
+//	LoadModel(BASE_PATH + std::string(md2FileName));
+//	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
+//	InitBuffer();
+//}
+
+void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 	LoadTexture(BASE_PATH + std::string(textureFileName));
 	LoadModel(BASE_PATH + std::string(md2FileName));
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
 }
-
 
 void Md2Model::SetPosition(float x, float y, float z)
 {

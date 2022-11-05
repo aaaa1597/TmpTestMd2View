@@ -156,8 +156,6 @@ class MainActivity : AppCompatActivity() {
         )
 
         /* cpp側 初期化 */
-
-        /* cpp側 初期化 */
         val modelnames = arrayOfNulls<String>(md2modelindex.size)
         val md2filenames = arrayOfNulls<String>(md2modelindex.size)
         val texfilenames = arrayOfNulls<String>(md2modelindex.size)
