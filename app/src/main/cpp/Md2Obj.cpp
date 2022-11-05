@@ -9,7 +9,6 @@ static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-//	LoadModel(BASE_PATH + std::string(md2FileName));
 	LoadTexture(BASE_PATH + std::string(textureFileName));
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
@@ -226,84 +225,4 @@ bool Md2Model::LoadModel() {
 	std::vector<char>().swap(mWkMd2BinData);
 
 	return true;
-}
-
-void Md2Model::LoadModel(std::string md2FileName)
-{
-	FILE *fp;
-	size_t length;
-
-	char *buffer;
-
-	md2header *head;
-	texindex *stPtrs;
-
-	mesh *bufIndexPtr;
-
-	fp = fopen(md2FileName.c_str(), "rb");
-	fseek(fp, 0, SEEK_END);
-	length = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	buffer = reinterpret_cast<char*>(malloc(length + 1));
-	fread(buffer, sizeof(char), length, fp);
-
-	head = reinterpret_cast<md2header*>(buffer);
-    /* TODO 削除予定 */
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d %s %s(%d)", head->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-
-    std::vector<vertex>().swap(mMdlData.vertexList);
-	std::vector<texstcoord>().swap(mMdlData.st);
-	std::vector<mesh>().swap(mMdlData.polyIndex);
-
-	mMdlData.numVertexsPerFrame = head->num_vertexs;
-	mMdlData.numTotalFrames = head->num_totalframes;
-
-	mMdlData.vertexList.resize(head->num_vertexs * head->num_totalframes);
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "1frame当り2の頂点数(%d)と総フレーム数(%d) %s %s(%d)", head->num_vertexs, head->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	for (size_t lpct = 0; lpct < head->num_totalframes; lpct++)
-	{
-		frame *fra = (frame *)&buffer[head->offset_frames + head->framesize * lpct];
-		vertex *vertexList = (vertex*)&mMdlData.vertexList[head->num_vertexs * lpct];
-		for (size_t lpct2 = 0; lpct2 < head->num_vertexs; lpct2++)
-		{
-			vertexList[lpct2].v[0] = fra->scale[0] * fra->fp[lpct2].v[0] + fra->translate[0];
-			vertexList[lpct2].v[1] = fra->scale[1] * fra->fp[lpct2].v[1] + fra->translate[1];
-			vertexList[lpct2].v[2] = fra->scale[2] * fra->fp[lpct2].v[2] + fra->translate[2];
-		}
-	}
-
-	mMdlData.st.resize(head->num_st);
-	stPtrs = (texindex *)&buffer[head->offset_st];
-
-	for (size_t count = 0; count < head->num_st; count++)
-	{
-		mMdlData.st[count].s = static_cast<float>(stPtrs[count].s) / static_cast<float>(head->skinwidth);
-		mMdlData.st[count].t = static_cast<float>(stPtrs[count].t) / static_cast<float>(head->skinheight);
-	}
-
-	mMdlData.polyIndex.resize(head->num_polys);
-	mMdlData.numPolys = head->num_polys;
-	bufIndexPtr = (mesh *)&buffer[head->offset_meshs];
-
-//	for (size_t count = 0; count < head->Number_Of_Frames; count++)
-//	{
-		for (size_t count2 = 0; count2 < head->num_polys; count2++)
-		{
-			mMdlData.polyIndex[count2].meshIndex[0] = bufIndexPtr[count2].meshIndex[0];
-			mMdlData.polyIndex[count2].meshIndex[1] = bufIndexPtr[count2].meshIndex[1];
-			mMdlData.polyIndex[count2].meshIndex[2] = bufIndexPtr[count2].meshIndex[2];
-
-			mMdlData.polyIndex[count2].stIndex[0] = bufIndexPtr[count2].stIndex[0];
-			mMdlData.polyIndex[count2].stIndex[1] = bufIndexPtr[count2].stIndex[1];
-			mMdlData.polyIndex[count2].stIndex[2] = bufIndexPtr[count2].stIndex[2];
-		}
-//	}
-
-	mMdlData.currentFrame = 0;
-	mMdlData.nextFrame = 1;
-	mMdlData.interpol = 0.0;
-
-	fclose(fp);
-	free(buffer);
 }

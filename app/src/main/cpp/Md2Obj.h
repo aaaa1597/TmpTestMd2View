@@ -56,7 +56,6 @@ public:
     bool LoadModel();
 
 private:
-    void LoadModel(std::string md2FileName);
     void LoadTexture(std::string textureFileName);
     void InitBuffer();
 
