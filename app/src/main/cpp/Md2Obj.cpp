@@ -130,19 +130,19 @@ void Md2Model::InitBuffer()
 				for (size_t j = 0; j < 3; j++)
 				{
 					// vertices
-					md2Vertices.emplace_back(currentFrame[m_model.polyIndx[index].meshIndex[p]].v[j]);
+					md2Vertices.emplace_back(currentFrame[m_model.polyIndex[index].meshIndex[p]].v[j]);
 				}
 
 				// next frame
 				for (size_t j = 0; j < 3; j++)
 				{
 					// vertices
-					md2Vertices.emplace_back(nextFrame[m_model.polyIndx[index].meshIndex[p]].v[j]);
+					md2Vertices.emplace_back(nextFrame[m_model.polyIndex[index].meshIndex[p]].v[j]);
 				}
 
 				// tex coords
-				md2Vertices.emplace_back(m_model.st[m_model.polyIndx[index].stIndex[p]].s);
-				md2Vertices.emplace_back(m_model.st[m_model.polyIndx[index].stIndex[p]].t);
+				md2Vertices.emplace_back(m_model.st[m_model.polyIndex[index].stIndex[p]].s);
+				md2Vertices.emplace_back(m_model.st[m_model.polyIndex[index].stIndex[p]].t);
 				vertexIndex++;
 			}
 			// End of the vertex data
@@ -201,14 +201,11 @@ void Md2Model::LoadModel(std::string md2FileName)
     /* TODO 削除予定 */
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d %s %s(%d)", head->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
-	free(m_model.st);
-	free(m_model.vertexList);
-	free(m_model.polyIndx);
-	m_model.st = nullptr;
-	m_model.vertexList = nullptr;
-	m_model.polyIndx = nullptr;
+    std::vector<vertex>().swap(m_model.vertexList);
+	std::vector<texstcoord>().swap(m_model.st);
+	std::vector<mesh>().swap(m_model.polyIndex);
 
-	m_model.vertexList = reinterpret_cast<vertex*>(malloc(sizeof(vertex) * head->num_vertexs * head->num_totalframes));
+	m_model.vertexList.resize(head->num_vertexs * head->num_totalframes);
 	m_model.numVertexsPerFrame = head->num_vertexs;
 	m_model.numTotalFrames = head->num_totalframes;
 
@@ -224,7 +221,7 @@ void Md2Model::LoadModel(std::string md2FileName)
 		}
 	}
 
-	m_model.st = reinterpret_cast<texstcoord*>(malloc(sizeof(texstcoord) * head->num_st));
+	m_model.st.resize(head->num_st);
 	stPtrs = (texindex *)&buffer[head->offset_st];
 
 	for (size_t count = 0; count < head->num_st; count++)
@@ -233,7 +230,7 @@ void Md2Model::LoadModel(std::string md2FileName)
 		m_model.st[count].t = static_cast<float>(stPtrs[count].t) / static_cast<float>(head->skinheight);
 	}
 
-	m_model.polyIndx = reinterpret_cast<mesh*>(malloc(sizeof(mesh) * head->num_polys));
+	m_model.polyIndex.resize(head->num_polys);
 	m_model.numPolys = head->num_polys;
 	bufIndexPtr = (mesh *)&buffer[head->offset_meshs];
 
@@ -241,13 +238,13 @@ void Md2Model::LoadModel(std::string md2FileName)
 //	{
 		for (size_t count2 = 0; count2 < head->num_polys; count2++)
 		{
-			m_model.polyIndx[count2].meshIndex[0] = bufIndexPtr[count2].meshIndex[0];
-			m_model.polyIndx[count2].meshIndex[1] = bufIndexPtr[count2].meshIndex[1];
-			m_model.polyIndx[count2].meshIndex[2] = bufIndexPtr[count2].meshIndex[2];
+			m_model.polyIndex[count2].meshIndex[0] = bufIndexPtr[count2].meshIndex[0];
+			m_model.polyIndex[count2].meshIndex[1] = bufIndexPtr[count2].meshIndex[1];
+			m_model.polyIndex[count2].meshIndex[2] = bufIndexPtr[count2].meshIndex[2];
 
-			m_model.polyIndx[count2].stIndex[0] = bufIndexPtr[count2].stIndex[0];
-			m_model.polyIndx[count2].stIndex[1] = bufIndexPtr[count2].stIndex[1];
-			m_model.polyIndx[count2].stIndex[2] = bufIndexPtr[count2].stIndex[2];
+			m_model.polyIndex[count2].stIndex[0] = bufIndexPtr[count2].stIndex[0];
+			m_model.polyIndex[count2].stIndex[1] = bufIndexPtr[count2].stIndex[1];
+			m_model.polyIndex[count2].stIndex[2] = bufIndexPtr[count2].stIndex[2];
 		}
 //	}
 

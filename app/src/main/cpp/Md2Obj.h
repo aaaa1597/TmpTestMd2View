@@ -29,9 +29,9 @@ struct MdlData {
     int currentFrame;
     int nextFrame;
     float interpol;
-    vertex *vertexList = nullptr;
-    texstcoord *st = nullptr;
-    mesh *polyIndx = nullptr;
+    std::vector<vertex>     vertexList;
+    std::vector<texstcoord> st;
+    std::vector<mesh>       polyIndex;
     float x, y, z;
     float nextX, nextY, nextZ;
     float radius;
