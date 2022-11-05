@@ -58,7 +58,7 @@ public:
 
 private:
     std::tuple<bool, int, int, unsigned char *> LoadTexture(std::string textureFileName);
-    void InitTexture(int w, int h, unsigned char *rgbabindata);
+    void InitTexture();
     void InitBuffer();
 
 public:

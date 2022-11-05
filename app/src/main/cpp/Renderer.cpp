@@ -14,10 +14,10 @@ bool Renderer::LoadModel(std::map<std::string, Md2Model> &md2models) {
         bool ret = value.LoadModel();
         std::vector<char>().swap(value.mWkMd2BinData);
         if( !ret) return false;
-//        /* テクスチャLoad */
-//        bool ret1 = value.LoadTexture();
-//        std::vector<char>().swap(value.mWkTexBinData);
-//        if( !ret1) return false;
+        /* テクスチャLoad */
+        bool ret1 = value.LoadTexture();
+        std::vector<char>().swap(value.mWkTexBinData);
+        if( !ret1) return false;
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model and Texture LOADED(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     }
     return true;
