@@ -52,6 +52,9 @@ public:
     size_t GetEndFrame();
     void SetPosition(float x, float y, float z);
 
+public:
+    bool LoadModel();
+
 private:
     void LoadModel(std::string md2FileName);
     void LoadTexture(std::string textureFileName);
@@ -72,6 +75,7 @@ public:
     std::vector<char>   mWkRgbaData = {0};
     /* 描画に必要なデータ */
     MdlData             m_model = {};
+    MdlData                 mMdlData = {0};
     glm::vec3 m_position = glm::vec3(0.0f, 0.0f, -25.0f);
     /* アニメ関連 */
     std::unordered_map<int, std::pair<int, int>> m_frameIndices = {};

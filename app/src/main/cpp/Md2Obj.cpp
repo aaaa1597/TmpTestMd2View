@@ -9,8 +9,8 @@ static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	LoadTexture(BASE_PATH + std::string(textureFileName));
 	LoadModel(BASE_PATH + std::string(md2FileName));
+	LoadTexture(BASE_PATH + std::string(textureFileName));
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
 }
@@ -160,6 +160,74 @@ void Md2Model::InitBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
+bool Md2Model::LoadModel() {
+	/* MD2ヘッダ */
+	md2header *header = (md2header*)mWkMd2BinData.data();
+
+	/* MD2形式チェック */
+	if(header->magicnumber != MD2_IDENT) { /* "IDP2"じゃないとエラー */
+		std::vector<char>().swap(mWkMd2BinData);
+		const union { int i; char b[4]; } ngno = {header->magicnumber};
+		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "MD2フォーマット不正(magicnumber=%s) %s %s(%d)", ngno.b, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+		return false;
+	}
+
+	if(header->version != MD2_VERSION) { /* 8じゃないとエラー */
+		std::vector<char>().swap(mWkMd2BinData);
+		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "MD2フォーマット不正(version=%d) %s %s(%d)", header->version, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+		return false;
+	}
+
+	/* 初期化 */
+	mMdlData.numVertexsPerFrame= header->num_vertexs;
+	mMdlData.numTotalFrames    = header->num_totalframes;
+
+	/* 頂点読込み */
+	mMdlData.vertexList.resize(header->num_vertexs * header->num_totalframes);
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "1frame当りの頂点数(%d)と総フレーム数(%d) %s %s(%d)", header->num_vertexs, header->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+	for(size_t lpct = 0; lpct < header->num_totalframes; lpct++) {
+		frame *lframe = (frame*)&(mWkMd2BinData[header->offset_frames + header->framesize * lpct]);
+		vertex *pvertex = &mMdlData.vertexList[header->num_vertexs * lpct];
+		for (size_t lpct2 = 0; lpct2 < header->num_vertexs; lpct2++) {
+			pvertex[lpct2].v[0] = lframe->scale[0] * lframe->fp[lpct2].v[0] + lframe->translate[0];
+			pvertex[lpct2].v[1] = lframe->scale[1] * lframe->fp[lpct2].v[1] + lframe->translate[1];
+			pvertex[lpct2].v[2] = lframe->scale[2] * lframe->fp[lpct2].v[2] + lframe->translate[2];
+		}
+	}
+
+	/* uvデータ読込み */
+	mMdlData.st.resize(header->num_st);
+	texindex *sts = (texindex*)&mWkMd2BinData[header->offset_st];
+	for (size_t lpct = 0; lpct < header->num_st; lpct++) {
+		mMdlData.st[lpct].s = static_cast<float>(sts[lpct].s) / static_cast<float>(header->skinwidth);
+		mMdlData.st[lpct].t = static_cast<float>(sts[lpct].t) / static_cast<float>(header->skinheight);
+	}
+
+	/* mesh情報読込み */
+	mMdlData.polyIndex.resize(header->num_polys);
+	mMdlData.numPolys = header->num_polys;
+	mesh *polyIndex = (mesh*)&mWkMd2BinData[header->offset_meshs];
+	for (size_t lpct = 0; lpct < header->num_polys; lpct++) {
+		mMdlData.polyIndex[lpct].meshIndex[0] = polyIndex[lpct].meshIndex[0];
+		mMdlData.polyIndex[lpct].meshIndex[1] = polyIndex[lpct].meshIndex[1];
+		mMdlData.polyIndex[lpct].meshIndex[2] = polyIndex[lpct].meshIndex[2];
+
+		mMdlData.polyIndex[lpct].stIndex[0] = polyIndex[lpct].stIndex[0];
+		mMdlData.polyIndex[lpct].stIndex[1] = polyIndex[lpct].stIndex[1];
+		mMdlData.polyIndex[lpct].stIndex[2] = polyIndex[lpct].stIndex[2];
+	}
+
+	/* アニメ関連情報初期化 */
+	mMdlData.currentFrame = 0;
+	mMdlData.nextFrame = 1;
+	mMdlData.interpol = 0.0;
+
+	/* MD2バイナリデータ解放 */
+	std::vector<char>().swap(mWkMd2BinData);
+
+	return true;
+}
+
 void Md2Model::LoadModel(std::string md2FileName)
 {
 	FILE *fp;
@@ -191,6 +259,7 @@ void Md2Model::LoadModel(std::string md2FileName)
 	m_model.vertexList.resize(head->num_vertexs * head->num_totalframes);
 	m_model.numVertexsPerFrame = head->num_vertexs;
 	m_model.numTotalFrames = head->num_totalframes;
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "1frame当り2の頂点数(%d)と総フレーム数(%d) %s %s(%d)", head->num_vertexs, head->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	for (size_t lpct = 0; lpct < head->num_totalframes; lpct++)
 	{
