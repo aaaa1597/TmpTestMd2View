@@ -2,6 +2,7 @@
 #include <android/log.h>
 #include "Md2Parts.h"
 #include "Md2Obj.h"
+#include "TexObj.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
 
@@ -9,8 +10,8 @@ static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	LoadTexture(BASE_PATH + std::string(textureFileName));
-	InitTexture();
+	auto [retbool, w, h, rgbabindata] = LoadTexture(BASE_PATH + std::string(textureFileName));
+	InitTexture(w, h, rgbabindata);
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
 }
@@ -67,13 +68,13 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
-void Md2Model::LoadTexture(std::string textureFileName)
+std::tuple<bool, int, int, unsigned char *> Md2Model::LoadTexture(std::string textureFileName)
 {
-	m_texture.LoadTexture(textureFileName, true);
+	return m_texture.LoadTexture(textureFileName, true);
 }
 
-void Md2Model::InitTexture() {
-	m_texture.InitTexture();
+void Md2Model::InitTexture(int w, int h, unsigned char *rgbabindata) {
+	m_texture.InitTexture(w, h, rgbabindata);
 	m_textureLoaded = true;
 }
 
@@ -230,4 +231,14 @@ bool Md2Model::LoadModel() {
 	std::vector<char>().swap(mWkMd2BinData);
 
 	return true;
+}
+
+bool Md2Model::LoadTexture() {
+	auto [retbool, w, h, rgbabindata] = TexObj::LoadTexture(mWkTexBinData);
+	if(retbool) {
+		mWkWidth = w;
+		mWkHeight= h;
+		mWkRgbaData = rgbabindata;
+	}
+	return retbool;
 }

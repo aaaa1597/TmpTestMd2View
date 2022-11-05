@@ -1,24 +1,20 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-add_library( # Sets the name of the library.
-        MD2Loader
+project("cppmd2loader")
 
-        # Sets the library as a shared library.
-        SHARED
-
-        # Provides a relative path to your source file(s).
+add_library(MD2Loader SHARED
         Renderer.cpp
         Renderer.h
         Md2Obj.cpp
         Jni.cpp
         ShaderProgram.cpp
-        Texture2D.cpp)
+        Texture2D.cpp
+        TexObj.cpp)
 
 include_directories(
         ./third_party_libraries)
 
-find_library(log-lib
-        log)
+find_library(log-lib log)
 
 target_link_libraries(
         MD2Loader
