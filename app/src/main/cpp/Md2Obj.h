@@ -54,9 +54,11 @@ public:
 
 public:
     bool LoadModel();
+    bool LoadTexture();
 
 private:
     void LoadTexture(std::string textureFileName);
+    void InitTexture();
     void InitBuffer();
 
 public:

@@ -23,11 +23,18 @@ bool Texture2D::LoadTexture(const string &fileName, bool generateMipMaps)
 	int components;
 
 	// Use stbi image library to load our image
-	unsigned char *imageData = stbi_load(fileName.c_str(), &width, &height, &components, STBI_rgb_alpha);
+	wkImageData = stbi_load(fileName.c_str(), &width, &height, &components, STBI_rgb_alpha);
+	wkWidth = width;
+	wkHeight= height;
+	wkGenerateMipMaps = generateMipMaps;
+	return true;
+}
 
-	if (imageData == nullptr)
+bool Texture2D::InitTexture()
+{
+	if (wkImageData == nullptr)
 	{
-		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "Error loading texture %s %s(%d)", fileName.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "Error loading texture %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 		return false;
 	}
 
@@ -37,16 +44,19 @@ bool Texture2D::LoadTexture(const string &fileName, bool generateMipMaps)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wkWidth, wkHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, wkImageData);
 
-	if (generateMipMaps)
+	if (wkGenerateMipMaps)
 	{
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 
-	stbi_image_free(imageData);
 	// unbinding our texture
 	glBindTexture(GL_TEXTURE_2D, 0);
+	stbi_image_free(wkImageData);
+	wkImageData = nullptr;
+	wkWidth = -1;
+	wkHeight= -1;
 	return true;
 }
 

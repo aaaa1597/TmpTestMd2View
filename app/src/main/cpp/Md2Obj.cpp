@@ -10,6 +10,7 @@ static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 	LoadTexture(BASE_PATH + std::string(textureFileName));
+	InitTexture();
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
 }
@@ -69,6 +70,10 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 void Md2Model::LoadTexture(std::string textureFileName)
 {
 	m_texture.LoadTexture(textureFileName, true);
+}
+
+void Md2Model::InitTexture() {
+	m_texture.InitTexture();
 	m_textureLoaded = true;
 }
 
