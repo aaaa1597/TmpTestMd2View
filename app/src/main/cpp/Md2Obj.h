@@ -1,6 +1,8 @@
 #ifndef CPPMD2VIEWER_MD2OBJ_H
 #define CPPMD2VIEWER_MD2OBJ_H
 
+#include <map>
+#include <string>
 #include <vector>
 #include <unordered_map>
 #include <memory>
@@ -55,16 +57,26 @@ private:
     void LoadTexture(std::string textureFileName);
     void InitBuffer();
 
+public:
     ShaderProgram       m_shaderProgram = {};
-    std::vector<GLuint> m_vboIndices;
+    std::vector<GLuint> m_vboIndices = {};
 
+public:
+    std::string         mName = {0};
+    std::vector<char>   mWkMd2BinData = {0};
+    std::vector<char>   mWkTexBinData = {0};
+    std::string         mWkVshStrData = {0};
+    std::string         mWkFshStrData = {0};
+    int                 mWkWidth = 0;
+    int                 mWkHeight= 0;
+    std::vector<char>   mWkRgbaData = {0};
     /* 描画に必要なデータ */
-    MdlData             m_model;
+    MdlData             m_model = {};
     glm::vec3 m_position = glm::vec3(0.0f, 0.0f, -25.0f);
     /* アニメ関連 */
-    std::unordered_map<int, std::pair<int, int>> m_frameIndices;
+    std::unordered_map<int, std::pair<int, int>> m_frameIndices = {};
     /* テクスチャ関連 */
-    Texture2D           m_texture;
+    Texture2D           m_texture = {};
     bool m_modelLoaded = false;
     bool m_textureLoaded = false;
     bool m_bufferInitialized = false;

@@ -7,6 +7,10 @@ using namespace Raydelto::MD2Loader;
 
 Renderer::Renderer() = default;
 
+bool Renderer::LoadModel(std::map<std::string, Md2Model> &md2models) {
+    return true;
+}
+
 void Renderer::OnSurfaceCreated()
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

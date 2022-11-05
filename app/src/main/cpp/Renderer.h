@@ -1,12 +1,14 @@
 #pragma once
 
+#include <map>
+#include <string>
+#include <memory>
 #include <jni.h>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <math.h>
 #include "glm/glm.hpp"
 #include "Md2Obj.h"
-#include <memory>
 
 namespace Raydelto::MD2Loader
 {
@@ -14,6 +16,8 @@ namespace Raydelto::MD2Loader
     {
     public:
         Renderer();
+
+        bool LoadModel(std::map<std::string, Md2Model> &md2models);
 
         void OnSurfaceCreated();
 

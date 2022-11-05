@@ -80,14 +80,12 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(
         }
 
         /* Md2model追加 */
-        gMd2Models.emplace(modelnamechar, Md2Model{ /*.mName=modelnamechar,
+        gMd2Models.emplace(modelnamechar, Md2Model{ .mName=modelnamechar,
                                                     .mWkMd2BinData=std::move(wk[0].second),
-                                                    .mWkTexBinData=std::move(wk[1].second),*/
+                                                    .mWkTexBinData=std::move(wk[1].second),
                                                     /* shaderはデータを文字列に変換して格納 */
-                                                    /*.mWkVshStrData=std::string(wk[2].second.begin(), wk[2].second.end()),
-                                                    .mWkFshStrData=std::string(wk[3].second.begin(), wk[3].second.end())*/});
-
-//        gMd2Models.at(modelnamechar).setFileName(md2filenamechar, texfilenamechar);
+                                                    .mWkVshStrData=std::string(wk[2].second.begin(), wk[2].second.end()),
+                                                    .mWkFshStrData=std::string(wk[3].second.begin(), wk[3].second.end())});
 
         /* char解放 */
         env->ReleaseStringUTFChars(modelnamejstr  , modelnamechar);
@@ -105,11 +103,11 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(
     }
 
     /* 初期化 */
-//    bool ret = Md2Obj::LoadModel(gMd2Models);
-//    if(!ret) {
-//        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::LoadModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-//        return false;
-//    }
+    bool ret = pRenderer->LoadModel(gMd2Models);
+    if(!ret) {
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::LoadModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+        return false;
+    }
 
     gMutex.unlock();
     return true;
