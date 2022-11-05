@@ -1,15 +1,28 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-set( lib_src_DIR ./opengl )
+add_library( # Sets the name of the library.
+        MD2Loader
 
-set( lib_build_DIR ../opengl/outputs )
-file(MAKE_DIRECTORY ${lib_build_DIR})
+        # Sets the library as a shared library.
+        SHARED
 
-add_subdirectory(${lib_src_DIR}
-                ${lib_build_DIR} )
+        # Provides a relative path to your source file(s).
+        Renderer.cpp
+        Renderer.h
+        MD2Model.cpp
+        Jni.cpp
+        ShaderProgram.cpp
+        Texture2D.cpp)
 
+include_directories(
+        ./third_party_libraries)
 
+find_library(log-lib
+        log)
 
-
-
-
+target_link_libraries(
+        MD2Loader
+        EGL
+        GLESv2
+        android
+        ${log-lib})
