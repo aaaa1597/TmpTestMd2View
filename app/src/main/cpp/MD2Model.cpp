@@ -87,7 +87,7 @@ void MD2Model::LoadTexture(std::string textureFileName)
 
 size_t MD2Model::GetEndFrame()
 {
-	return m_model->numFrames - 1;
+	return m_model->numTotalFrames - 1;
 }
 
 void MD2Model::InitBuffer()
@@ -99,23 +99,23 @@ void MD2Model::InitBuffer()
 	std::vector<float> md2Vertices;
 	const size_t startFrame = 0;
 	size_t endFrame = GetEndFrame();
-	Raydelto::MD2Loader::vertex *currentFrame;
-	Raydelto::MD2Loader::vertex *nextFrame;
+	vertex *currentFrame;
+	vertex *nextFrame;
 	m_model->currentFrame = startFrame;
 	m_model->interpol = 0.0f;
 
 	size_t vertexIndex = 0;
 	size_t startVertex = 0;
 
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d numPoly=%d numVertexsperframe=%d %s %s(%d)", endFrame, m_model->numTriangles, m_model->numVertexs, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d numPoly=%d numVertexsperframe=%d %s %s(%d)", endFrame, m_model->numPolys, m_model->numVertexsPerFrame, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	// fill buffer
 	while (m_model->currentFrame <= endFrame)
 	{
-		currentFrame = &m_model->vertexList[m_model->numVertexs * m_model->currentFrame];
-		nextFrame = m_model->currentFrame == endFrame ? &m_model->vertexList[m_model->numVertexs * startFrame] : &m_model->vertexList[m_model->numVertexs * (m_model->currentFrame + 1)];
+		currentFrame = &m_model->vertexList[m_model->numVertexsPerFrame * m_model->currentFrame];
+		nextFrame = m_model->currentFrame == endFrame ? &m_model->vertexList[m_model->numVertexsPerFrame * startFrame] : &m_model->vertexList[m_model->numVertexsPerFrame * (m_model->currentFrame + 1)];
 		startVertex = vertexIndex;
-		for (size_t index = 0; index < m_model->numTriangles; index++)
+		for (size_t index = 0; index < m_model->numPolys; index++)
 		{
 
 			// Start of the vertex data
@@ -154,7 +154,7 @@ void MD2Model::InitBuffer()
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "count=%d (m_frameIndices[frameIndex].first * 8)=%d  %s %s(%d)", count, m_frameIndices[frameIndex].first * 8, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);																											   // "bind" or set as the current buffer we are working with
-	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * m_model->numFrames, &md2Vertices[m_frameIndices[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * m_model->numTotalFrames, &md2Vertices[m_frameIndices[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
 
 	// Current Frame Position attribute
 	glVertexAttribPointer(m_posAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
@@ -196,17 +196,16 @@ void MD2Model::LoadModel(std::string md2FileName)
     /* TODO 削除予定 */
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d %s %s(%d)", head->num_totalframes, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
-	m_model.reset(reinterpret_cast<modData*>(malloc(sizeof(modData))));
+	m_model.reset(reinterpret_cast<MdlData*>(malloc(sizeof(MdlData))));
 
-	m_model->vertexList = reinterpret_cast<Raydelto::MD2Loader::vertex*>(malloc(sizeof(Raydelto::MD2Loader::vertex) * head->num_vertexs * head->num_totalframes));
-	m_model->numVertexs = head->num_vertexs;
-	m_model->numFrames = head->num_totalframes;
-	m_model->frameSize = head->framesize;
+	m_model->vertexList = reinterpret_cast<vertex*>(malloc(sizeof(vertex) * head->num_vertexs * head->num_totalframes));
+	m_model->numVertexsPerFrame = head->num_vertexs;
+	m_model->numTotalFrames = head->num_totalframes;
 
 	for (size_t lpct = 0; lpct < head->num_totalframes; lpct++)
 	{
 		frame *fra = (frame *)&buffer[head->offset_frames + head->framesize * lpct];
-		Raydelto::MD2Loader::vertex *vertexList = (Raydelto::MD2Loader::vertex *)&m_model->vertexList[head->num_vertexs * lpct];
+		vertex *vertexList = (vertex*)&m_model->vertexList[head->num_vertexs * lpct];
 		for (size_t lpct2 = 0; lpct2 < head->num_vertexs; lpct2++)
 		{
 			vertexList[lpct2].v[0] = fra->scale[0] * fra->fp[lpct2].v[0] + fra->translate[0];
@@ -215,8 +214,7 @@ void MD2Model::LoadModel(std::string md2FileName)
 		}
 	}
 
-	m_model->st = reinterpret_cast<textcoord*>(malloc(sizeof(textcoord) * head->num_st));
-	m_model->numST = head->num_st;
+	m_model->st = reinterpret_cast<texstcoord*>(malloc(sizeof(texstcoord) * head->num_st));
 	stPtrs = (texindex *)&buffer[head->offset_st];
 
 	for (size_t count = 0; count < head->num_st; count++)
@@ -226,7 +224,7 @@ void MD2Model::LoadModel(std::string md2FileName)
 	}
 
 	m_model->polyIndx = reinterpret_cast<mesh*>(malloc(sizeof(mesh) * head->num_polys));
-	m_model->numTriangles = head->num_polys;
+	m_model->numPolys = head->num_polys;
 	bufIndexPtr = (mesh *)&buffer[head->offset_meshs];
 
 //	for (size_t count = 0; count < head->Number_Of_Frames; count++)

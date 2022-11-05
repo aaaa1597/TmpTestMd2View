@@ -1,74 +1,34 @@
 #pragma once
 
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
-
-#include <cstdio>
-#include <cstdlib>
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include <cstdio>
+#include <cstdlib>
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#include "Md2Parts.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 namespace Raydelto::MD2Loader
 {
     class ShaderProgram;
     class Texture2D;
 
-    struct textcoord
+    struct MdlData
     {
-        float s;
-        float t;
-    };
-
-    struct texindex
-    {
-        short s;
-        short t;
-    };
-
-    struct framePoint_t
-    {
-        unsigned char v[3];
-        unsigned char normalIndex;
-    };
-
-    struct frame
-    {
-        float scale[3];
-        float translate[3];
-        char name[16];
-        framePoint_t fp[1];
-    };
-
-    struct mesh
-    {
-        unsigned short meshIndex[3];
-        unsigned short stIndex[3];
-    };
-
-    struct vertex
-    {
-        float v[3];
-    };
-
-    struct modData
-    {
-        int numFrames;
-        int numVertexs;
-        int numTriangles;
-        int numST;
-        int frameSize;
+        int numTotalFrames;
+        int numVertexsPerFrame;
+        int numPolys;
         int twidth;
         int theight;
         int currentFrame;
         int nextFrame;
         float interpol;
+        vertex *vertexList;
+        texstcoord *st;
         mesh *polyIndx;
-        textcoord *st;
-        Raydelto::MD2Loader::vertex *vertexList;
         float x, y, z;
         float nextX, nextY, nextZ;
         float radius;
@@ -92,7 +52,7 @@ namespace Raydelto::MD2Loader
         void LoadTexture(std::string textureFileName);
         void InitBuffer();
 
-        std::unique_ptr<modData> m_model;
+        std::unique_ptr<MdlData> m_model;
         std::unique_ptr<Texture2D> m_texture;
         std::vector<GLuint> m_vboIndices;
         std::unique_ptr<ShaderProgram> m_shaderProgram;
