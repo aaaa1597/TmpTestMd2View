@@ -16,9 +16,9 @@ Md2Model::Md2Model(const char *md2FileName, const char *textureFileName) : m_tex
 																		   m_modelLoaded(false),
 																		   m_textureLoaded(false),
 																		   m_bufferInitialized(false),
-																		   m_posAttrib(NULL),
-																		   m_nextPosAttrib(NULL),
-																		   m_texCoordAttrib(NULL)
+																		   mCurPosAttrib(NULL),
+																		   mNextPosAttrib(NULL),
+																		   mTexCoordAttrib(NULL)
 {
 	LoadTexture(BASE_PATH + std::string(textureFileName));
 	LoadModel(BASE_PATH + std::string(md2FileName));
@@ -71,10 +71,10 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 	auto count = m_frameIndices[frame].second - m_frameIndices[frame].first + 1;
 	m_shaderProgram->SetUniform("interpolation", interpolation);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glVertexAttribPointer(m_posAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
-	glVertexAttribPointer(m_nextPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-	glVertexAttribPointer(m_texCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
+	glBindBuffer(GL_ARRAY_BUFFER, mVboId);
+	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
+	glVertexAttribPointer(mNextPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
 	glDrawArrays(GL_TRIANGLES, m_frameIndices[frame].first, count);
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
@@ -92,9 +92,9 @@ size_t Md2Model::GetEndFrame()
 
 void Md2Model::InitBuffer()
 {
-	m_posAttrib = glGetAttribLocation( m_shaderProgram->GetProgram(), "pos");
-	m_nextPosAttrib = glGetAttribLocation( m_shaderProgram->GetProgram(), "nextPos");
-	m_texCoordAttrib = glGetAttribLocation( m_shaderProgram->GetProgram(), "texCoord");
+	mCurPosAttrib = glGetAttribLocation(m_shaderProgram->GetProgram(), "pos");
+	mNextPosAttrib = glGetAttribLocation(m_shaderProgram->GetProgram(), "nextPos");
+	mTexCoordAttrib = glGetAttribLocation(m_shaderProgram->GetProgram(), "texCoord");
 
 	std::vector<float> md2Vertices;
 	const size_t startFrame = 0;
@@ -148,26 +148,26 @@ void Md2Model::InitBuffer()
 	}
 
 	size_t frameIndex = startFrame;
-	glGenBuffers(1, &m_vbo); // Generate an empty vertex buffer on the GPU
+	glGenBuffers(1, &mVboId); // Generate an empty vertex buffer on the GPU
 
 	size_t count = m_frameIndices[frameIndex].second - m_frameIndices[frameIndex].first + 1;
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "count=%d (m_frameIndices[frameIndex].first * 8)=%d  %s %s(%d)", count, m_frameIndices[frameIndex].first * 8, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);																											   // "bind" or set as the current buffer we are working with
+	glBindBuffer(GL_ARRAY_BUFFER, mVboId);																											   // "bind" or set as the current buffer we are working with
 	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * m_model->numTotalFrames, &md2Vertices[m_frameIndices[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
 
 	// Current Frame Position attribute
-	glVertexAttribPointer(m_posAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
-	glEnableVertexAttribArray(m_posAttrib);
+	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
+	glEnableVertexAttribArray(mCurPosAttrib);
 
 	// Next  Frame Position attribute
-	glVertexAttribPointer(m_nextPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(m_nextPosAttrib);
+	glVertexAttribPointer(mNextPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(mNextPosAttrib);
 
 	// Texture Coord attribute
-	glVertexAttribPointer(m_texCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(m_texCoordAttrib);
-	m_vboIndices.emplace_back(m_vbo);
+	glVertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(mTexCoordAttrib);
+	m_vboIndices.emplace_back(mVboId);
 	m_bufferInitialized = true;
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }

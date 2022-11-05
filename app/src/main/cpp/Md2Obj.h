@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CPPMD2VIEWER_MD2OBJ_H
+#define CPPMD2VIEWER_MD2OBJ_H
 
 #include <vector>
 #include <unordered_map>
@@ -10,6 +11,9 @@
 #include "Md2Parts.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+
+#define MD2_IDENT   (('2'<<24) + ('P'<<16) + ('D'<<8) + 'I')    /* magic number "IDP2" or 844121161 */
+#define	MD2_VERSION 8                                           /* model version */
 
 namespace Raydelto::MD2Loader
 {
@@ -64,9 +68,11 @@ private:
     bool m_textureLoaded;
     bool m_bufferInitialized;
     /* シェーダー関連 */
-    GLuint m_vbo;
-    GLuint m_posAttrib;
-    GLuint m_nextPosAttrib;
-    GLuint m_texCoordAttrib;
+    GLuint mVboId         = -1;
+    GLuint mCurPosAttrib  = -1;
+    GLuint mNextPosAttrib = -1;
+    GLuint mTexCoordAttrib= -1;
 };
+
 }
+#endif //CPPMD2VIEWER_MD2OBJ_H
