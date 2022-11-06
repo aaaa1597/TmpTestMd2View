@@ -10,7 +10,7 @@ static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	LoadTexture(BASE_PATH + std::string(textureFileName));
+//	LoadTexture(BASE_PATH + std::string(textureFileName));
 	InitTexture();
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
@@ -78,6 +78,15 @@ void Md2Model::LoadTexture(std::string textureFileName)
 		for(int lpct = 0; lpct < w*h*4; lpct++) {
 			mWkRgbaData[lpct] = rgbabindata[lpct];
 		}
+	}
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "w,h(%d,%d) %s %s(%d)", mWkWidth, mWkHeight, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+	for(int lpct = 0; lpct < mWkRgbaData.size(); lpct+=16) {
+		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "[%d](%x,%x,%x,%x,%x,%x,%x,%x %x,%x,%x,%x,%x,%x,%x,%x) %s %s(%d)", lpct,
+							mWkRgbaData[lpct+ 0],mWkRgbaData[lpct+ 1],mWkRgbaData[lpct+ 2],mWkRgbaData[lpct+ 3],
+							mWkRgbaData[lpct+ 4],mWkRgbaData[lpct+ 5],mWkRgbaData[lpct+ 6],mWkRgbaData[lpct+ 7],
+							mWkRgbaData[lpct+ 8],mWkRgbaData[lpct+ 9],mWkRgbaData[lpct+10],mWkRgbaData[lpct+11],
+							mWkRgbaData[lpct+12],mWkRgbaData[lpct+13],mWkRgbaData[lpct+14],mWkRgbaData[lpct+15],
+							__PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 	}
 	return;
 }
@@ -251,7 +260,16 @@ bool Md2Model::LoadTexture() {
 	if(retbool) {
 		mWkWidth = w;
 		mWkHeight= h;
-		mWkRgbaData = rgbabindata;
+		mWkRgbaData = std::move(rgbabindata);
+	}
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "w,h(%d,%d) %s %s(%d)", mWkWidth, mWkHeight, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+	for(int lpct = 0; lpct < mWkRgbaData.size(); lpct+=16) {
+		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "[%d](%x,%x,%x,%x,%x,%x,%x,%x %x,%x,%x,%x,%x,%x,%x,%x) %s %s(%d)", lpct,
+							mWkRgbaData[lpct+ 0],mWkRgbaData[lpct+ 1],mWkRgbaData[lpct+ 2],mWkRgbaData[lpct+ 3],
+							mWkRgbaData[lpct+ 4],mWkRgbaData[lpct+ 5],mWkRgbaData[lpct+ 6],mWkRgbaData[lpct+ 7],
+							mWkRgbaData[lpct+ 8],mWkRgbaData[lpct+ 9],mWkRgbaData[lpct+10],mWkRgbaData[lpct+11],
+							mWkRgbaData[lpct+12],mWkRgbaData[lpct+13],mWkRgbaData[lpct+14],mWkRgbaData[lpct+15],
+							__PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 	}
 	return retbool;
 }

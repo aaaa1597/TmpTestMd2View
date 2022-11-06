@@ -4,6 +4,14 @@
 #include <vector>
 #include <GLES2/gl2.h>
 
+enum class EComponentType : int {
+    Default    = 0, // only used for req_comp
+    grey       = 1,
+    grey_alpha = 2,
+    rgb        = 3,
+    rgb_alpha  = 4
+};
+
 #pragma pack(2)
 typedef struct BITMAPFILEHEADER {
     char    bm[2];      /* "BM" */
@@ -39,12 +47,12 @@ typedef struct BITMAPCOREHEADER {   /* Windows Bitmap */
 #pragma pack(1)
 typedef struct TGAHEADER {
     unsigned char	id_length;      /* size of the structure */
-    unsigned char	color_map_type; /* カラーマップタイプ */
+    unsigned char	has_color_map;  /* カラーマップ有無 */
     unsigned char	image_type;     /* データ形式 */
 
-    short int		cm_first_entry; /* colormap開始位置 (通常0) */
-    short int		cm_length;      /* colormap数 (通常0) */
-    unsigned char	cm_size;        /* colormapサイズ(bits) */
+    short int		cm_palette_start; /* colormap開始位置 (通常0) */
+    short int		cm_palette_len;   /* colormap数 (通常0) */
+    unsigned char	cm_palette_bits;  /* colormapサイズ(bits) */
 
     short int		is_xorigin;     /* lower left X coordinate (0固定) */
     short int		is_yorigin;     /* lower left Y coordinate (0固定) */
@@ -52,7 +60,7 @@ typedef struct TGAHEADER {
     short int		is_width;       /* 画像幅(pixels) */
     short int		is_height;      /* 画像高さ(pixels) */
 
-    unsigned char	is_pixel_depth; /* 1画素のbit数: 16, 24, 32 */
+    unsigned char	is_bits_per_pixel; /* 1画素のbit数: 16, 24, 32 */
     unsigned char	is_image_descriptor;// 24 bits = 0x00; 32 bits = 0x80 */
 
 } TgaHeader;
@@ -83,7 +91,9 @@ public:
 
 private:
     static std::tuple<int/*幅*/, int/*高さ*/, std::vector<char>/*RGBA*/> LoadTextureFromBmp(std::vector<char> &texbindata);
-    static std::tuple<int/*幅*/, int/*高さ*/, std::vector<char>/*RGBA*/> LoadTextureFromTga(std::vector<char> &texbindata);
+    static std::tuple<int/*幅*/, int/*高さ*/, std::vector<char>/*RGBA*/> LoadTextureFromTga(std::vector<char> &texbindata, EComponentType type);
+    static std::vector<char> convertFormat(const std::vector<char> &data, int nowcomp, int reqcomp, unsigned int width, unsigned int is_height);
+    static unsigned char Compute_y(int r, int g, int b);
 };
 
 #endif //CPPMD2VIEWER_TEXOBJ_H

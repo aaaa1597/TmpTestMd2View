@@ -10,6 +10,27 @@ std::tuple<bool, int, int, std::vector<char>> TexObj::LoadTexture(std::vector<ch
 
     std::istringstream texbinstream(std::string(texbindata.begin(), texbindata.end()));
 
+    /* フォーマットチェック(JPG) */
+    /* future plan */
+
+    /* フォーマットチェック(PNG) */
+    /* future plan */
+
+    /* フォーマットチェック(GIF) */
+    /* future plan */
+
+    /* フォーマットチェック(PSD) */
+    /* future plan */
+
+    /* フォーマットチェック(PIC) */
+    /* future plan */
+
+    /* フォーマットチェック(PNM) */
+    /* future plan */
+
+    /* フォーマットチェック(HDR) */
+    /* future plan */
+
     /* フォーマットチェック(BMP) */
     char bm[2] = {0};
     texbinstream.read(bm, sizeof(bm));
@@ -34,7 +55,7 @@ std::tuple<bool, int, int, std::vector<char>> TexObj::LoadTexture(std::vector<ch
     if(std::string(TRUEVISION_TARGA).find("TRUEVISION-") == 0) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "TGA形式(%s) %s %s(%d)", TRUEVISION_TARGA, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         /* TGA読込み */
-        auto[w, h, wkbuf] = LoadTextureFromTga(texbindata);
+        auto[w, h, wkbuf] = LoadTextureFromTga(texbindata, EComponentType::rgb_alpha);
         retImgw = w;
         retImgh = h;
         retRgbaBuf = std::move(wkbuf);
@@ -122,7 +143,7 @@ std::tuple<int/*幅*/, int/*高さ*/, std::vector<char>/*RGBA*/> TexObj::LoadTex
 }
 
 /* TGAフォーマット読込み */
-std::tuple<int/*幅*/, int/*高さ*/, std::vector<char>/*RGBA*/> TexObj::LoadTextureFromTga(std::vector<char> &texbindata) {
+std::tuple<int/*幅*/, int/*高さ*/, std::vector<char>/*RGBA*/> TexObj::LoadTextureFromTga(std::vector<char> &texbindata, EComponentType reqType) {
     std::vector<char> retRgbaBuf;
     int retw = 0, reth = 0;
 
@@ -133,252 +154,201 @@ std::tuple<int/*幅*/, int/*高さ*/, std::vector<char>/*RGBA*/> TexObj::LoadTex
     TgaHeader tgaheader;
     texbinstream.read((char*)&tgaheader, sizeof(TgaHeader));
 
-    int width = 0, height = 0, bitdepth = 0;
+    /* do a tiny bit of precessing */
+    bool isRLE = false;
+    if ( tgaheader.image_type >= 8 ) {
+        tgaheader.image_type -= 8;
+        isRLE = true;
+    }
+
+    /* int tga_alpha_bits = tga_inverted & 15; */
+    tgaheader.is_image_descriptor =  1 - ((tgaheader.is_image_descriptor >> 5) & 1);
+
+    if( (tgaheader.is_width < 1) || (tgaheader.is_height < 1) ||
+        (tgaheader.image_type < 1) || (tgaheader.image_type > 3) ||
+        ((tgaheader.is_bits_per_pixel != 8) && (tgaheader.is_bits_per_pixel != 16) &&
+         (tgaheader.is_bits_per_pixel != 24) && (tgaheader.is_bits_per_pixel != 32))    ) {
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "未サポート TGAファイル!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+        retw = 0, reth = 0;
+        std::vector<char>().swap(retRgbaBuf);
+        return {retw, reth, retRgbaBuf};
+    }
+
+    /* パレットを使用している場合の、パレットのビット数 */
+    int retComponent = tgaheader.is_bits_per_pixel / 8;
+    if ( tgaheader.has_color_map ) {
+        retComponent = tgaheader.cm_palette_bits / 8;
+    }
 
     /* 画像幅/高さ取得 */
     retw = tgaheader.is_width;
     reth = tgaheader.is_height;
 
     /* RGBA領域確保 */
-    retRgbaBuf.resize(retw * reth * 4);
+    retRgbaBuf.resize(retw * reth * retComponent);
+
+    /* IDフィールド長分読み飛ばし(たいていは0) */
+    texbinstream.seekg(tgaheader.id_length, std::ios::cur );
 
     /* カラーパレット読込み */
-    std::unique_ptr<RgbTriple[]> colorpalette = nullptr;
-    if(tgaheader.color_map_type) {
-        /* 24ビットイメージと32ビットイメージはパレット化されない */
-        colorpalette = std::make_unique<RgbTriple[]>(tgaheader.cm_length);
-        texbinstream.read((char*)&(colorpalette[0]), sizeof(RgbTriple) * tgaheader.cm_length);
+    std::unique_ptr<unsigned char[]> colorpalette = nullptr;
+    if(!tgaheader.has_color_map && !isRLE) {
+        for(int lpct=0; lpct < tgaheader.is_height; ++lpct) {
+            int y = tgaheader.is_image_descriptor ? tgaheader.is_height - lpct - 1 : lpct;
+            char *tga_row = &retRgbaBuf[y*tgaheader.is_width*retComponent];
+            texbinstream.read(tga_row, tgaheader.is_width * retComponent);
+        }
     }
+    else {
+        if(tgaheader.has_color_map) {
+            /* colormap開始位置まで読み飛ばし */
+            texbinstream.seekg(tgaheader.cm_palette_start, std::ios::cur );
 
-    bool flipvert = true;
-    unsigned char *ptr = nullptr;
-    switch(tgaheader.image_type) {
-        case 0: __android_log_print(ANDROID_LOG_ERROR, "aaaaa", "Not Supported ImageType=%d", tgaheader.image_type); break;  /* not supported */
-        case 1: /* COLOR-MAPPED BGR 8 BITS GREYSCALE case 3の処理と同じ */
-//              break;
-        case 3: /* COLOR-MAPPED BGR 8 BITS */ {
-            for(int rowidx = tgaheader.is_height - 1; rowidx >= 0; rowidx-- ) {
-                if( flipvert )
-                    ptr = (unsigned char*)&(retRgbaBuf[rowidx * tgaheader.is_width * 4 ]);
+            /* colorパレットの一括読込み */
+            colorpalette = std::make_unique<unsigned char[]>(tgaheader.cm_palette_len * tgaheader.cm_palette_bits / 8);
+            texbinstream.read((char*)&(colorpalette[0]), tgaheader.cm_palette_len * tgaheader.cm_palette_bits / 8);
+        }
 
-                for(int col = 0; col < tgaheader.is_width; col++, ptr += 4 ) {
-                    // read the current pixel
-                    unsigned char coloridx;
-                    texbinstream.read((char*)&coloridx, sizeof(unsigned char));
+        /* 実データ読込み */
+        int RLE_count = 0;
+        int RLE_repeating = 0;
+        bool read_next_pixel = true;
+        for(int lpi = 0; lpi < tgaheader.is_width * tgaheader.is_height; ++lpi) {
+            if ( isRLE ) {
+                if ( RLE_count == 0 ) {
+                    //   yep, get the next byte as a RLE command
+                    char charRLE_cmd = -1;
+                    int RLE_cmd;
+                    texbinstream.read((char*)&(charRLE_cmd), 1);
+                    RLE_cmd = charRLE_cmd;
+                    RLE_count = 1 + (RLE_cmd & 127);
 
-                    // convert indexed pixel (8 bits) into rgba (32 bits) pixel
-                    ptr[0] = colorpalette[ coloridx ].rgbtRed;  // b->r
-                    ptr[1] = colorpalette[ coloridx ].rgbtGreen;// g->g
-                    ptr[2] = colorpalette[ coloridx ].rgbtBlue; // r->b
-                    ptr[3] = 0xff;                          // alpha
+                    RLE_repeating = RLE_cmd >> 7;
+                    read_next_pixel = true;
+                }
+                else if ( !RLE_repeating ) {
+                    read_next_pixel = true;
                 }
             }
-            break;
-        }
-        case 2:{
-            for(int rowidx = tgaheader.is_height - 1; rowidx >= 0; rowidx-- ) {
-                if( flipvert )
-                    ptr = (unsigned char*)&(retRgbaBuf[rowidx * tgaheader.is_width * 4]);
+            else {
+                read_next_pixel = true;
+            }
 
-                for(int colidx = 0; colidx < tgaheader.is_width; colidx++, ptr += 4 ) {
-                    switch( tgaheader.is_pixel_depth ) {
-                        case 16: {  // TRUE-COLOR BGR 16 BITS
-                            // read the current pixel
-                            unsigned char color;
-                            texbinstream.read((char*)&color, sizeof(unsigned short));
-
-                            // convert bgr (16 bits) pixel into rgba (32 bits) pixel
-                            ptr[0] = ((color & 0x7C00) >> 10) << 3;	// b->r
-                            ptr[1] = ((color & 0x03E0) >>  5) << 3;	// g->g
-                            ptr[2] = ((color & 0x001F) >>  0) << 3;	// r->b
-                            ptr[3] = 255;							// alpha
-
-                            break;
-                        }
-                        case 24: {  // TRUE-COLOR BGR 24 BITS
-                            // convert bgr (24 bits) pixel into rgba (32 bits) pixel
-                            RgbTriple pix;
-                            texbinstream.read((char*)&pix, sizeof(RgbTriple));
-
-                            ptr[0] = pix.rgbtRed;
-                            ptr[1] = pix.rgbtGreen;
-                            ptr[2] = pix.rgbtBlue;
-                            ptr[3] = 255;
-
-                            break;
-                        }
-                        case 32: {  // TRUE-COLOR BGR 32 BITS
-                            // convert bgr (32 bits) pixel into rgba (32 bits) pixel
-                            BgraQuad pix;
-                            texbinstream.read((char*)&pix, sizeof(BgraQuad));
-
-                            ptr[0] = pix.bgraRed;
-                            ptr[1] = pix.bgraGreen;
-                            ptr[2] = pix.bgraBlue;
-                            ptr[3] = pix.bgraAlpha;
-
-                            break;
-                        }
+            /* pixel読込み */
+            unsigned char wkrawdata[4] = {0};
+            if( read_next_pixel) {
+                if(tgaheader.has_color_map) {
+                    /* 1バイト読込み → チェック */
+                    char char_pal_idx;
+                    texbinstream.read((char*)&(char_pal_idx), 1);
+                    int pal_idx = char_pal_idx;
+                    if( pal_idx >= tgaheader.cm_palette_len ) {
+                        /* invalid index */
+                        pal_idx = 0;
+                    }
+                    pal_idx *= (tgaheader.is_bits_per_pixel / 8);
+                    for(int lpj = 0; lpj*8 < tgaheader.is_bits_per_pixel; ++lpj) {
+                        wkrawdata[lpj] = colorpalette[pal_idx + lpj];
                     }
                 }
-            }
-            break;
-        }
-        case 9: // RLE COLOR-MAPPED BGR 8 BITS
-        case 11:// RLE COLOR-MAPPED BGR 8 BITS GREYSCALE
-        {
-            unsigned char packetHeader, packetSize;
-            for(int rowidx = tgaheader.is_height - 1; rowidx >= 0; rowidx-- ) {
-                if( flipvert )
-                    ptr = (unsigned char*)&(retRgbaBuf[rowidx * tgaheader.is_width * 4]);
-
-                for(int col = 0; col < tgaheader.is_width; /* rien */ ) {
-                    texbinstream.read((char*)&packetHeader, sizeof(unsigned char));
-                    packetSize = 1 + (packetHeader & 0x7f);
-                    if( packetHeader & 0x80 ) {
-                        // run-length packet
-                        // read the current pixel
-                        unsigned char coloridx;
-                        texbinstream.read((char*)&coloridx, sizeof(unsigned char));
-
-                        // convert indexed pixel (8 bits) pixel into rgba (32 bits) pixel
-                        for(int lpi = 0; lpi < packetSize; lpi++, ptr += 4, col++ ) {
-                            ptr[0] = colorpalette[ coloridx ].rgbtRed;     // b->r
-                            ptr[1] = colorpalette[ coloridx ].rgbtGreen;   // g->g
-                            ptr[2] = colorpalette[ coloridx ].rgbtBlue;    // r->b
-                            ptr[3] = 255;                           // alpha
-                        }
-                    }
-                    else {
-                        // non run-length packet
-                        for(int lpi = 0; lpi < packetSize; lpi++, ptr += 4, col++ ) {
-                            // read the current pixel
-                            unsigned char coloridx;
-                            texbinstream.read((char*)&coloridx, sizeof(unsigned char));
-
-                            // convert indexed pixel (8 bits) pixel into rgba (32 bits) pixel
-                            ptr[0] = colorpalette[ coloridx ].rgbtRed;		// b->r
-                            ptr[1] = colorpalette[ coloridx ].rgbtGreen;	// g->g
-                            ptr[2] = colorpalette[ coloridx ].rgbtBlue;		// r->b
-                            ptr[3] = 255;							// alpha
-                        }
+                else {
+                    /* データ読込み */
+                    for(int lpj = 0; lpj*8 < tgaheader.is_bits_per_pixel; ++lpj) {
+                        texbinstream.read((char*)&(wkrawdata[lpj]), 1);
                     }
                 }
-            }
-            break;
+                /*  次pixel読込みフラグの初期化 */
+                read_next_pixel = 0;
+            }   /* pixel読込み */
+
+            /* 取得データを設定 */
+            for(int lpj = 0; lpj < retComponent; ++lpj)
+                retRgbaBuf[lpi*retComponent+lpj] = wkrawdata[lpj];
+
+            /* in case we're in RLE mode, keep counting down */
+            --RLE_count;
         }
-        case 10: {
-            unsigned char packetHeader, packetSize;
-            for(int rowidx = tgaheader.is_height - 1; rowidx >= 0; rowidx-- ) {
-                if( flipvert )
-                    ptr = (unsigned char*)&(retRgbaBuf[rowidx * tgaheader.is_width * 4]);
 
-                for(int colidx = 0; colidx < tgaheader.is_width; /* rien */ ) {
-                    texbinstream.read((char*)&packetHeader, sizeof(unsigned char));
-                    packetSize		= 1 + (packetHeader & 0x7f);
-                    if( packetHeader & 0x80 ) {
-                        // run-length packet
-                        switch( tgaheader.is_pixel_depth ) {
-                            case 16: {  // RLE TRUE-COLOR BGR 16 BITS
-                                // read the current pixel
-                                unsigned short color;
-                                texbinstream.read((char*)&color, sizeof(unsigned short));
-
-                                // convert bgr (16 bits) pixel into rgba (32 bits) pixel
-                                for(int lpi = 0; lpi < packetSize; lpi++, ptr += 4, colidx++ ) {
-                                    ptr[0] = ((color & 0x7C00) >> 10) << 3;	// b->r
-                                    ptr[1] = ((color & 0x03E0) >>  5) << 3;	// g->g
-                                    ptr[2] = ((color & 0x001F) >>  0) << 3;	// r->b
-                                    ptr[3] = 255;
-                                }
-                                break;
-                            }
-
-                            case 24: {  // RLE TRUE-COLOR BGR 24 BITS
-                                // convert bgr (24 bits) pixel into rgba (32 bits) pixel
-                                RgbTriple pix;
-                                texbinstream.read((char*)&pix, sizeof(RgbTriple));
-
-                                for(int lpi = 0; lpi < packetSize; lpi++, ptr += 4, colidx++ ) {
-                                    ptr[0] = pix.rgbtRed;
-                                    ptr[1] = pix.rgbtGreen;
-                                    ptr[2] = pix.rgbtBlue;
-                                    ptr[3] = 255;
-                                }
-                                break;
-                            }
-
-                            case 32: {  // RLE TRUE-COLOR BGR 32 BITS
-                                // convert bgr (32 bits) pixel into rgba (32 bits) pixel
-                                BgraQuad pix;
-                                texbinstream.read((char*)&pix, sizeof(BgraQuad));
-
-                                for(int lpi = 0; lpi < packetSize; lpi++, ptr += 4, colidx++ ) {
-                                    ptr[0] = pix.bgraRed;
-                                    ptr[1] = pix.bgraGreen;
-                                    ptr[2] = pix.bgraBlue;
-                                    ptr[3] = pix.bgraAlpha;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        // non run-length packet
-                        for(int lpi = 0; lpi < packetSize; lpi++, ptr += 4, colidx++ ) {
-                            switch( tgaheader.is_pixel_depth ) {
-                                case 16: {  // RLE TRUE-COLOR BGR 16 BITS
-                                    // read the current pixel
-                                    unsigned short color;
-                                    texbinstream.read((char*)&color, sizeof(unsigned short));
-
-                                    // convert bgr (16 bits) pixel into rgba (32 bits) pixel
-                                    ptr[0] = ((color & 0x7C00) >> 10) << 3;	// b->r
-                                    ptr[1] = ((color & 0x03E0) >>  5) << 3;	// g->g
-                                    ptr[2] = ((color & 0x001F) >>  0) << 3;	// r->b
-                                    ptr[3] = 255;							// alpha
-
-                                    break;
-                                }
-
-                                case 24: {  // RLE TRUE-COLOR BGR 24 BITS
-                                    // convert bgr (24 bits) pixel into rgba (32 bits) pixel
-                                    RgbTriple pix;
-                                    texbinstream.read((char*)&pix, sizeof(RgbTriple));
-
-                                    ptr[0] = pix.rgbtRed;
-                                    ptr[1] = pix.rgbtGreen;
-                                    ptr[2] = pix.rgbtBlue;
-                                    ptr[3] = 255;
-
-                                    break;
-                                }
-
-                                case 32: {  // RLE TRUE-COLOR BGR 32 BITS
-                                    // convert bgr (32 bits) pixel into rgba (32 bits) pixel
-                                    BgraQuad pix;
-                                    texbinstream.read((char*)&pix, sizeof(BgraQuad));
-
-                                    ptr[0] = pix.bgraRed;
-                                    ptr[1] = pix.bgraGreen;
-                                    ptr[2] = pix.bgraBlue;
-                                    ptr[3] = pix.bgraAlpha;
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
+        //   do I need to invert the image?
+        if( tgaheader.is_image_descriptor ) {
+            for (int lpj = 0; lpj*2 < tgaheader.is_height; ++lpj) {
+                int index1 = lpj * tgaheader.is_width * retComponent;
+                int index2 = (tgaheader.is_height - 1 - lpj) * tgaheader.is_width * retComponent;
+                for(int lpi = tgaheader.is_width * retComponent; lpi > 0; --lpi) {
+                    unsigned char temp = retRgbaBuf[index1];
+                    retRgbaBuf[index1] = retRgbaBuf[index2];
+                    retRgbaBuf[index2] = temp;
+                    ++index1;
+                    ++index2;
                 }
             }
-        }
-        default: {
-            __android_log_print(ANDROID_LOG_ERROR, "aaaaa", "Unknown format!! ImageType=%d", tgaheader.image_type);
-            return {0, 0, retRgbaBuf};
         }
     }
 
+    /* clear color palette */
     colorpalette.reset();
+
+    /* swap RGB */
+    if(retComponent >= 3) {
+        unsigned char *tga_pixel = (unsigned char *)&(retRgbaBuf[0]);
+        for(int lpi=0; lpi < tgaheader.is_width * tgaheader.is_height; ++lpi) {
+            unsigned char temp = tga_pixel[0];
+            tga_pixel[0] = tga_pixel[2];
+            tga_pixel[2] = temp;
+            tga_pixel += retComponent;
+        }
+    }
+
+    // convert to target component count
+    if(static_cast<int>(reqType) && (static_cast<int>(reqType) != retComponent))
+        retRgbaBuf = TexObj::convertFormat(retRgbaBuf, retComponent, static_cast<int>(reqType), tgaheader.is_width, tgaheader.is_height);
 
     return {retw, reth, retRgbaBuf};
 }
+
+std::vector<char> TexObj::convertFormat(const std::vector<char> &rgbadata, int nowcomp, int reqcomp, unsigned int width, unsigned int height) {
+    std::vector<char> retRbgaBuf;
+
+    /* 引数チェック */
+    if(reqcomp < 1 || 4 < reqcomp)
+        return retRbgaBuf;
+    if (reqcomp == nowcomp) {
+        retRbgaBuf = rgbadata;
+        return retRbgaBuf;
+    }
+
+    retRbgaBuf.resize(reqcomp * width * height);
+
+    for(int lpj=0; lpj < (int)height; ++lpj) {
+        const unsigned char *src  = reinterpret_cast<const unsigned char*>(&(rgbadata[lpj * width * nowcomp]));
+        unsigned char *dest = reinterpret_cast<unsigned char*>(&(retRbgaBuf[lpj * width * reqcomp]));
+
+#define COMBO(a,b)  ((a)*8+(b))
+#define CASE(a,b)   case COMBO(a,b): for(int lpi=width-1; lpi >= 0; --lpi, src += a, dest += b)
+        // convert source image with nowcomp components to one with reqcomp components;
+        // avoid switch per pixel, so use switch per scanline and massive macros
+        switch (COMBO(nowcomp, reqcomp)) {
+            CASE(1,2) dest[0]=src[0], dest[1]=255; break;
+            CASE(1,3) dest[0]=dest[1]=dest[2]=src[0]; break;
+            CASE(1,4) dest[0]=dest[1]=dest[2]=src[0], dest[3]=255; break;
+            CASE(2,1) dest[0]=src[0]; break;
+            CASE(2,3) dest[0]=dest[1]=dest[2]=src[0]; break;
+            CASE(2,4) dest[0]=dest[1]=dest[2]=src[0], dest[3]=src[1]; break;
+            CASE(3,4) dest[0]=src[0],dest[1]=src[1],dest[2]=src[2],dest[3]=255; break;
+            CASE(3,1) dest[0]=TexObj::Compute_y(src[0],src[1],src[2]); break;
+            CASE(3,2) dest[0]=TexObj::Compute_y(src[0],src[1],src[2]), dest[1] = 255; break;
+            CASE(4,1) dest[0]=TexObj::Compute_y(src[0],src[1],src[2]); break;
+            CASE(4,2) dest[0]=TexObj::Compute_y(src[0],src[1],src[2]), dest[1] = src[3]; break;
+            CASE(4,3) dest[0]=src[0],dest[1]=src[1],dest[2]=src[2]; break;
+            default: return retRbgaBuf;
+        }
+#undef CASE
+    }
+
+    return retRbgaBuf;
+}
+
+unsigned char TexObj::Compute_y(int r, int g, int b) {
+    return (unsigned char)(((r*77) + (g*150) +  (29*b)) >> 8);
+}
+
