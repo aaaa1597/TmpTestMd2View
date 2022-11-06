@@ -28,6 +28,7 @@ public:
     static void DeleteShaders(GLuint programId);
     static void activeTexture(GLenum texture);
     static void bindTexture(GLenum target, GLuint textureid);
+    static void deleteTextures(GLsizei size, const GLuint *textures);
 
 private:
     static bool CheckCompileErrors(GLuint sid, EShaderType type);

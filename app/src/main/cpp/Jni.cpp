@@ -145,7 +145,21 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(
 
 JNIEXPORT void JNICALL
 Java_com_tks_cppmd2viewer_Jni_00024Companion_onStop(JNIEnv *env, jobject thiz) {
-    // TODO: implement onStop()
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "%s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+
+    /* glDeleteTextures() */
+    const std::map<std::string, Md2Model> &md2models = gMd2Models;
+    const std::vector<unsigned int> &texids = []() {
+                                                        std::vector<unsigned int> retvec = {};
+                                                        retvec.reserve(md2models.size());
+                                                        for(auto &[key, value] : md2models) {
+                                                            retvec.push_back(value.mTexId);
+                                                        }
+                                                        return retvec;
+                                                    }();
+    GlObj::deleteTextures((GLsizei)texids.size(), texids.data());
+
+    return;
 }
 
 /* モデルデータ位置設定 */

@@ -87,7 +87,7 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 {
 	glEnable(GL_DEPTH_TEST);
 	assert(m_textureLoaded && m_bufferInitialized);
-	m_texture.Bind(0);
+	m_texture.Bind(0, mTexId);
 	glm::mat4 model;
 
 	model = glm::translate(model, m_position) *
@@ -300,7 +300,7 @@ bool Md2Model::LoadTexture() {
 /* TextureデータをOpenGLで使えるようにする */
 bool Md2Model::InitTexture() {
     /* OpenGLのTexture初期化 */
-	m_texture.InitTexture(mWkWidth, mWkHeight,
+	mTexId = m_texture.InitTexture(mWkWidth, mWkHeight,
 						  reinterpret_cast<unsigned char*>(mWkRgbaData.data()));
 //    auto[boolret, texid] = GlObj::InitTexture(mWkWidth, mWkHeight, mWkRgbaData.data());
 //    if(boolret)

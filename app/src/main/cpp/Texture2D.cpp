@@ -13,10 +13,10 @@ Texture2D::Texture2D()
 
 Texture2D::~Texture2D()
 {
-	glDeleteTextures(1, &mTexture);
+//	glDeleteTextures(1, &mTexture);
 }
 
-bool Texture2D::InitTexture(int w, int h, unsigned char *rgbabindata)
+GLuint Texture2D::InitTexture(int w, int h, unsigned char *rgbabindata)
 {
 	if (rgbabindata == nullptr)
 	{
@@ -24,8 +24,9 @@ bool Texture2D::InitTexture(int w, int h, unsigned char *rgbabindata)
 		return false;
 	}
 
-	glGenTextures(1, &mTexture);
-	glBindTexture(GL_TEXTURE_2D, mTexture);
+	GLuint retTexid;
+	glGenTextures(1, &retTexid);
+	glBindTexture(GL_TEXTURE_2D, retTexid);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -40,12 +41,12 @@ bool Texture2D::InitTexture(int w, int h, unsigned char *rgbabindata)
 	// unbinding our texture
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(rgbabindata);
-	return true;
+	return retTexid;
 }
 
-void Texture2D::Bind(GLuint texUnit) const
+void Texture2D::Bind(GLuint texUnit, GLuint texture) const
 {
 	assert(texUnit >= 0 && texUnit < 32);
 	glActiveTexture(GL_TEXTURE0 + texUnit);
-	glBindTexture(GL_TEXTURE_2D, mTexture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 }

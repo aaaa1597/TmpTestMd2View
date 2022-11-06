@@ -243,3 +243,7 @@ void GlObj::activeTexture(GLenum texture) {
 void GlObj::bindTexture(GLenum target, GLuint textureid) {
     glBindTexture(target, textureid);
 }
+
+void GlObj::deleteTextures(GLsizei size, const GLuint *textures) {
+    glDeleteTextures(size, textures);
+}
