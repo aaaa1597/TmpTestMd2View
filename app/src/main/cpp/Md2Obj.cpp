@@ -8,6 +8,59 @@
 
 static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 
+/* Md2モデル読込み(model読込,tex読込) */
+bool Md2Obj::LoadModel(std::map<std::string, Md2Model> &md2models) {
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "%s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+
+    for(auto &[key, value] : md2models) {
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model load start (%s). %s %s(%d)", value.mName.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+        /* MD2モデルLoad */
+        bool ret = value.LoadModel();
+        std::vector<char>().swap(value.mWkMd2BinData);
+        if( !ret) return false;
+        /* テクスチャLoad */
+        bool ret1 = value.LoadTexture();
+        std::vector<char>().swap(value.mWkTexBinData);
+        if( !ret1) return false;
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model and Texture LOADED(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    }
+
+    return true;
+}
+
+/* Md2モデル初期化(特にOpenGL系は、onSurfaceCreated()ドリブンで動作しないとエラーになる) */
+bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
+    for(auto &[key, value] : md2models) {
+//        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model Init start (%s). %s %s(%d)", value.mName.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+//        /* テクスチャInit */
+//        bool ret2 = value.InitTexture();
+//        std::vector<char>().swap(value.mWkTexBinData);
+//        if( !ret2) return false;
+//        /* シェーダ初期化 */
+//        bool ret3 = value.InitShaders();
+//        if( !ret3) return false;
+//        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Shader Init end(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    }
+    return true;
+}
+
+/* Md2モデル描画 */
+bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj::ArgType &globalSpacePrm, float elapsedtimeMs) {
+//    const std::array<float, 16> &aMvpMat     = std::get<0>(globalSpacePrm);
+//    const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
+//    float Scale                              = std::get<2>(globalSpacePrm);
+//    float Rotatex                            = std::get<3>(globalSpacePrm);
+//    float Rotatey                            = std::get<4>(globalSpacePrm);
+//
+//    /* glEnable(GL_DEPTH_TEST); */
+//    GlObj::enable(GL_DEPTH_TEST);
+//
+//    for(auto &[key, value] : md2models) {
+//        value.DrawModel(aMvpMat, amNormalMat, Scale, Rotatex, Rotatey, elapsedtimeMs);
+//    }
+    return true;
+}
+
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 //	LoadTexture(BASE_PATH + std::string(textureFileName));

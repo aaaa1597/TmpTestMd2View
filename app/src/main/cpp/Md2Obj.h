@@ -90,4 +90,12 @@ public:
     GLuint mTexCoordAttrib= -1;
 };
 
+class Md2Obj {
+public:
+    static bool LoadModel(std::map<std::string, Md2Model> &md2models);
+    static bool InitModel(std::map<std::string, Md2Model> &md2models);
+    using ArgType = std::tuple<const std::array<float, 16> &, const std::array<float, 16> &, float, float, float>;
+    static bool DrawModel(std::map<std::string, Md2Model> &md2models, const ArgType &globalSpacePrm, float elapsedtimeMs);
+};
+
 #endif //CPPMD2VIEWER_MD2OBJ_H

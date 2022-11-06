@@ -7,6 +7,7 @@
 #include <android/log.h>
 #include <android/asset_manager_jni.h>
 #include "Md2Obj.h"
+#include "GlObj.h"
 #include "Renderer.h"
 
 #ifdef __cplusplus
@@ -103,7 +104,7 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(
     }
 
     /* 初期化 */
-    bool ret = pRenderer->LoadModel(gMd2Models);
+    bool ret = Md2Obj::LoadModel(gMd2Models);
     if(!ret) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::LoadModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         return false;
@@ -115,7 +116,16 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(
 
 /* onSurfaceCreated */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCreated(JNIEnv *env, jobject thiz) {
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "%s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gMutex.lock();  /* onStart()の実行終了を待つ */
+
+    /* OpenGL初期化(GL系は、このタイミングでないとエラーになる) */
+    GlObj::GlInit();
+
     pRenderer->OnSurfaceCreated(gMd2Models);
+
+    gMutex.unlock();
+    return;
 }
 
 /* onSurfaceChanged */

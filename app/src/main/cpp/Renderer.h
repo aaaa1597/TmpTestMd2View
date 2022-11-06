@@ -17,8 +17,6 @@ namespace Raydelto::MD2Loader
     public:
         Renderer();
 
-        bool LoadModel(std::map<std::string, Md2Model> &md2models);
-
         void OnSurfaceCreated(std::map<std::string, Md2Model> &md2models);
 
         void OnSurfaceChanged(int width, int height);

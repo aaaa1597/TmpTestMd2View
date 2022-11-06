@@ -5,7 +5,7 @@ import android.content.res.AssetManager
 class Jni {
     companion object {
         init {
-            System.loadLibrary("MD2Loader")
+            System.loadLibrary("jni")
         }
 
         external fun onStart(assets: AssetManager?, modelnames: Array<String?>?, md2filenames: Array<String?>?, texfilenames: Array<String?>?, vshfilenames: Array<String?>?, fshfilenames: Array<String?>? ): Boolean
