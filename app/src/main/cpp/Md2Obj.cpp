@@ -300,19 +300,17 @@ bool Md2Model::LoadTexture() {
 /* TextureデータをOpenGLで使えるようにする */
 bool Md2Model::InitTexture() {
     /* OpenGLのTexture初期化 */
-	mTexId = m_texture.InitTexture(mWkWidth, mWkHeight,
-						  reinterpret_cast<unsigned char*>(mWkRgbaData.data()));
-//    auto[boolret, texid] = GlObj::InitTexture(mWkWidth, mWkHeight, mWkRgbaData.data());
-//    if(boolret)
-//        mTexId = texid;
+    auto[boolret, texid] = GlObj::InitTexture(mWkWidth, mWkHeight, mWkRgbaData.data());
+    if(boolret)
+        mTexId = texid;
 
     /* 解放処理 */
     mWkWidth = 0;
     mWkHeight= 0;
-//	std::vector<char>().swap(mWkRgbaData);
+	std::vector<char>().swap(mWkRgbaData);
 	m_textureLoaded = true;
 
-    return true;
+    return boolret;
 }
 
 /* シェーダをOpenGLで使えるようにする */
