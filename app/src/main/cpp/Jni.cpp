@@ -132,6 +132,16 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
 
     gMd2Models.at("grunt").SetPosition(0.0f, 6.5f, -25.0f);
 
+
+    gGlobalSpacePrm.mCameraPos = {0.0f, 0.0f, 0.0f};
+    gGlobalSpacePrm.mTargetPos = {0.0f, 0.0f, -20.0f};
+    gGlobalSpacePrm.mUpPos     = {1.0f, 0.0f, 0.0f};
+    gGlobalSpacePrm.mViewMat   = Mat44::getLookAtf(gGlobalSpacePrm.mCameraPos, gGlobalSpacePrm.mTargetPos, gGlobalSpacePrm.mUpPos);
+
+    /* ビュー行列を更新したので再計算 */
+    std::array<float, 16> vpmat = Mat44::multMatrixf(gGlobalSpacePrm.mProjectionMat, gGlobalSpacePrm.mViewMat);
+    gGlobalSpacePrm.mMvpMat     = Mat44::multMatrixf(vpmat, gGlobalSpacePrm.mModelMat);
+
     gMutex.unlock();
     return;
 }

@@ -11,13 +11,14 @@ add_library(MD2Loader SHARED
 
 add_library(jni SHARED Jni.cpp)
 add_library(globj SHARED GlObj.cpp)
+add_library(matobj SHARED MatObj.cpp)
 
 include_directories(
         ./third_party_libraries)
 
 find_library(log-lib log)
 
-target_link_libraries(jni ${log-lib} android MD2Loader globj)
+target_link_libraries(jni ${log-lib} android MD2Loader globj matobj)
 target_link_libraries(
         MD2Loader
         EGL
