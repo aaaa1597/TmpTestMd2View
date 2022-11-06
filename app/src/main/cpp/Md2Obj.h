@@ -80,7 +80,8 @@ public:
     /* アニメ関連 */
     std::unordered_map<int, std::pair<int, int>> mFrameIndices = {};
     /* テクスチャ関連 */
-    Texture2D           m_texture = {};
+    GLuint mTexId = -1;
+	Texture2D           m_texture = {};
     bool m_textureLoaded = false;
     bool m_bufferInitialized = false;
     /* シェーダー関連 */

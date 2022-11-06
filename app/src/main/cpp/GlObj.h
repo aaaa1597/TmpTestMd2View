@@ -18,9 +18,10 @@ using RetShaderAttribs = std::tuple<bool, std::unordered_map<int, std::pair<int,
 
 class GlObj {
 public:
-    /* OpenGL‰Šú‰» */
+    /* OpenGLåˆæœŸåŒ– */
     static void GlInit();
-    /* Texture‰Šú‰» */
+    /* TextureåˆæœŸåŒ– */
+    static std::tuple<bool, GLuint> InitTexture(int width, int height, const char *rgbabindbuf);
     static std::tuple<bool, GLuint> LoadShaders(const std::string &vshstrdata, const std::string &fshstrdata);
     static RetShaderAttribs setAttribute(GLuint programId, int totalframes,
                                          const std::vector<vertex> &vertexs, const std::vector<mesh> &polyIndexs, const std::vector<texstcoord> &sts);

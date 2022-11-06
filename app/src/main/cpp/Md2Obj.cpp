@@ -302,6 +302,9 @@ bool Md2Model::InitTexture() {
     /* OpenGLのTexture初期化 */
 	m_texture.InitTexture(mWkWidth, mWkHeight,
 						  reinterpret_cast<unsigned char*>(mWkRgbaData.data()));
+//    auto[boolret, texid] = GlObj::InitTexture(mWkWidth, mWkHeight, mWkRgbaData.data());
+//    if(boolret)
+//        mTexId = texid;
 
     /* 解放処理 */
     mWkWidth = 0;
