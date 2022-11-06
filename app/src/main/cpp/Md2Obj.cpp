@@ -3,6 +3,7 @@
 #include "Md2Parts.h"
 #include "Md2Obj.h"
 #include "TexObj.h"
+#include "GlObj.h"
 #include "ShaderProgram.h"
 #include "Texture2D.h"
 
@@ -36,9 +37,9 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
         bool ret2 = value.InitTexture();
         std::vector<char>().swap(value.mWkTexBinData);
         if( !ret2) return false;
-//        /* シェーダ初期化 */
-//        bool ret3 = value.InitShaders();
-//        if( !ret3) return false;
+//      /* シェーダ初期化 */
+//      bool ret3 = value.InitShaders();
+//      if( !ret3) return false;
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Shader Init end(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     }
     return true;
@@ -46,13 +47,13 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
 
 /* Md2モデル描画 */
 bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj::ArgType &globalSpacePrm, float elapsedtimeMs) {
-//    const std::array<float, 16> &aMvpMat     = std::get<0>(globalSpacePrm);
-//    const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
-//    float Scale                              = std::get<2>(globalSpacePrm);
-//    float Rotatex                            = std::get<3>(globalSpacePrm);
-//    float Rotatey                            = std::get<4>(globalSpacePrm);
-//
-//    /* glEnable(GL_DEPTH_TEST); */
+    const std::array<float, 16> &aMvpMat     = std::get<0>(globalSpacePrm);
+    const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
+    float Scale                              = std::get<2>(globalSpacePrm);
+    float Rotatex                            = std::get<3>(globalSpacePrm);
+    float Rotatey                            = std::get<4>(globalSpacePrm);
+
+    /* glEnable(GL_DEPTH_TEST); */
 //    GlObj::enable(GL_DEPTH_TEST);
 //
 //    for(auto &[key, value] : md2models) {
@@ -110,14 +111,14 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
     m_shaderProgram.SetUniform("mvpmat", vpmat * model);
 	/* ↑これもOK ここまで */
 
-	auto count = m_frameIndices[frame].second - m_frameIndices[frame].first + 1;
+	auto count = mFrameIndices[frame].second - mFrameIndices[frame].first + 1;
 	m_shaderProgram.SetUniform("interpolation", interpolation);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVboId);
 	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
 	glVertexAttribPointer(mNextPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
 	glVertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-	glDrawArrays(GL_TRIANGLES, m_frameIndices[frame].first, count);
+	glDrawArrays(GL_TRIANGLES, mFrameIndices[frame].first, count);
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
@@ -190,18 +191,18 @@ void Md2Model::InitBuffer()
 			// End of the vertex data
 		}
 
-		m_frameIndices[mMdlData.currentFrame] = {startVertex, vertexIndex - 1};
+		mFrameIndices[mMdlData.currentFrame] = {startVertex, vertexIndex - 1};
 		mMdlData.currentFrame++;
 	}
 
 	size_t frameIndex = startFrame;
 	glGenBuffers(1, &mVboId); // Generate an empty vertex buffer on the GPU
 
-	size_t count = m_frameIndices[frameIndex].second - m_frameIndices[frameIndex].first + 1;
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "count=%d (m_frameIndices[frameIndex].first * 8)=%d  %s %s(%d)", count, m_frameIndices[frameIndex].first * 8, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+	size_t count = mFrameIndices[frameIndex].second - mFrameIndices[frameIndex].first + 1;
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "count=%d (mFrameIndices[frameIndex].first * 8)=%d  %s %s(%d)", count, mFrameIndices[frameIndex].first * 8, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVboId);																											   // "bind" or set as the current buffer we are working with
-	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * mMdlData.numTotalFrames, &md2Vertices[m_frameIndices[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * mMdlData.numTotalFrames, &md2Vertices[mFrameIndices[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
 
 	// Current Frame Position attribute
 	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
@@ -287,6 +288,7 @@ bool Md2Model::LoadModel() {
 	return true;
 }
 
+/* AssetsからTextureデータを読込む */
 bool Md2Model::LoadTexture() {
 	auto [retbool, w, h, rgbabindata] = TexObj::LoadTexture(mWkTexBinData);
 	if(retbool) {
@@ -305,3 +307,31 @@ bool Md2Model::LoadTexture() {
 	}
 	return retbool;
 }
+
+/* シェーダをOpenGLで使えるようにする */
+bool Md2Model::InitShaders() {
+    /* シェーダ読込み */
+    auto[retboot, progid] = GlObj::LoadShaders(mWkVshStrData, mWkFshStrData);
+    if( !retboot) {
+        mProgramId = -1;
+        return false;
+    }
+    mProgramId = progid;
+
+    /* シェーダのAttributeにデータ一括設定 */
+    auto[retbool, retAnimFrameS2e, retVboID, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = GlObj::setAttribute(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
+    if( !retbool) {
+        GlObj::DeleteShaders(mProgramId);
+        mProgramId =-1;
+        return false;
+    }
+
+    mFrameIndices  = std::move(retAnimFrameS2e);
+    mVboId         = retVboID;
+    mCurPosAttrib  = retCurPosAttrib;
+    mNextPosAttrib = retNextPosAttrib;
+    mTexCoordAttrib= retTexCoordAttrib;
+
+    return true;
+}
+

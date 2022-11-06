@@ -56,7 +56,7 @@ public:
     bool LoadModel();
     bool LoadTexture(); /* AssetsからTextureデータを読込む */
     bool InitTexture(); /* TextureデータをOpenGLで使えるようにする */
-
+    bool InitShaders(); /* シェーダをOpenGLで使えるようにする */
 
 private:
     void InitBuffer();
@@ -78,13 +78,14 @@ public:
     MdlData                 mMdlData = {0};
     glm::vec3 m_position = glm::vec3(0.0f, 0.0f, -25.0f);
     /* アニメ関連 */
-    std::unordered_map<int, std::pair<int, int>> m_frameIndices = {};
+    std::unordered_map<int, std::pair<int, int>> mFrameIndices = {};
     /* テクスチャ関連 */
     Texture2D           m_texture = {};
     bool m_textureLoaded = false;
     bool m_bufferInitialized = false;
     /* シェーダー関連 */
     GLuint mVboId         = -1;
+    GLuint mProgramId     = -1;
     GLuint mCurPosAttrib  = -1;
     GLuint mNextPosAttrib = -1;
     GLuint mTexCoordAttrib= -1;

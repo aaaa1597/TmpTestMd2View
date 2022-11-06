@@ -20,10 +20,17 @@ class GlObj {
 public:
     /* OpenGLèâä˙âª */
     static void GlInit();
+    /* Textureèâä˙âª */
+    static std::tuple<bool, GLuint> LoadShaders(const std::string &vshstrdata, const std::string &fshstrdata);
+    static RetShaderAttribs setAttribute(GLuint programId, int totalframes,
+                                         const std::vector<vertex> &vertexs, const std::vector<mesh> &polyIndexs, const std::vector<texstcoord> &sts);
+    static void DeleteShaders(GLuint programId);
     static void activeTexture(GLenum texture);
     static void bindTexture(GLenum target, GLuint textureid);
 
 private:
+    static bool CheckCompileErrors(GLuint sid, EShaderType type);
+    static bool CheckLinkError(GLuint programId);
     static std::map<std::string, GLint>     mUniformLocations;
 };
 #endif //CPPMD2VIEWER_GLOBJ_H
