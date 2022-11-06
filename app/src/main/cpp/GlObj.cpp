@@ -237,6 +237,11 @@ RetShaderAttribs GlObj::setAttribute(GLuint programId, int totalframes,
     return {true, retAnimFrameS2e, retVboId, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib};
 }
 
+/* ウィンドウのサイズの定義 */
+void GlObj::setViewport(int x, int y, int width, int height) {
+    glViewport(x, y, width, height);
+}
+
 void GlObj::activeTexture(GLenum texture) {
     glActiveTexture(texture);
 }
@@ -249,8 +254,8 @@ void GlObj::deleteTextures(GLsizei size, const GLuint *textures) {
     glDeleteTextures(size, textures);
 }
 
-void GlObj::useProgram(GLuint progId) {
-    glUseProgram(progId);
+void GlObj::useProgram(GLuint programId) {
+    glUseProgram(programId);
 }
 
 void GlObj::deleteProgram(GLuint progid) {

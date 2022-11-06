@@ -17,8 +17,6 @@ namespace Raydelto::MD2Loader
     public:
         Renderer();
 
-        void OnSurfaceCreated(std::map<std::string, Md2Model> &md2models);
-
         void OnSurfaceChanged(int width, int height);
 
         void OnDrawFrame(std::map<std::string, Md2Model> &md2models);
@@ -33,8 +31,6 @@ namespace Raydelto::MD2Loader
         glm::vec3 m_camPos;
         glm::vec3 m_targetPos;
         glm::vec3 m_up;
-        int m_width = 0;
-        int m_height = 0;
         size_t m_renderFrame = 0;
         float m_interpolation = 0.0f;
         float m_rotationX = 0.0f;

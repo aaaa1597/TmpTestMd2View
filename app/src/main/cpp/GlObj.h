@@ -26,11 +26,12 @@ public:
     static RetShaderAttribs setAttribute(GLuint programId, int totalframes,
                                          const std::vector<vertex> &vertexs, const std::vector<mesh> &polyIndexs, const std::vector<texstcoord> &sts);
     static void DeleteShaders(GLuint programId);
+    static void setViewport(int x, int y, int width, int height);
     static void activeTexture(GLenum texture);
     static void bindTexture(GLenum target, GLuint textureid);
-    static void deleteTextures(GLsizei size, const GLuint *textures);
-    static void useProgram(GLuint progId);
+    static void useProgram(GLuint programId);
     static void deleteProgram(GLuint progid);
+    static void deleteTextures(GLsizei size, const GLuint *textures);
 
 private:
     static bool CheckCompileErrors(GLuint sid, EShaderType type);

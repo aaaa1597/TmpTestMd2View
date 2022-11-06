@@ -7,28 +7,11 @@ using namespace Raydelto::MD2Loader;
 
 Renderer::Renderer() = default;
 
-void Renderer::OnSurfaceCreated(std::map<std::string, Md2Model> &md2models)
-{
-    glClearColor(0.0f, 0.12f, 0.0f, 0.4f);
-
-    Md2Model *m_player = &md2models.at("female");
-    Md2Model *m_player2= &md2models.at("grunt");
-
-//    m_player = std::make_unique<Md2Model>(/*"female.md2", "female.tga"*/);
-//    m_player->setFileName("female.md2","female.tga");
-//    m_player2 = std::make_unique<Md2Model>(/*"grunt.md2", "grunt.tga"*/);
-//    m_player2->setFileName("grunt.md2","grunt.tga");
-    m_player2->SetPosition(0.0f, 6.5f, -25.0f);
-}
-
 void Renderer::OnSurfaceChanged(int width, int height) {
-    m_width = width;
-    m_height = height;
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "(w,h)=(%d,%d) %s %s(%d)", width, height, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
     // Create the projection matrix
-    assert(m_height != 0);
-    float aspectRatio = static_cast<float>(m_width) / static_cast<float>(m_height);
+    float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
     m_projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
     m_camPos = glm::vec3(0.0f, 0.0f, 0.0f);
     m_targetPos = glm::vec3(0.0f, 0.0f, -20.0f);

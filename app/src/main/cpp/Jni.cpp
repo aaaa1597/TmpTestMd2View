@@ -136,6 +136,11 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
 
 /* onSurfaceChanged */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceChanged(JNIEnv *env, jobject thiz, jint width, jint height) {
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "w=%d h=%d %s %s(%d)", width, height, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+
+    /* setViewport() */
+    GlObj::setViewport(0, 0, width, height);
+
     pRenderer->OnSurfaceChanged(width, height);
 }
 
