@@ -14,7 +14,6 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "ShaderProgram.h"
-#include "Texture2D.h"
 
 #define MD2_IDENT   (('2'<<24) + ('P'<<16) + ('D'<<8) + 'I')    /* magic number "IDP2" or 844121161 */
 #define	MD2_VERSION 8                                           /* model version */
@@ -81,7 +80,6 @@ public:
     std::unordered_map<int, std::pair<int, int>> mFrameIndices = {};
     /* テクスチャ関連 */
     GLuint mTexId = -1;
-	Texture2D           m_texture = {};
     bool m_textureLoaded = false;
     bool m_bufferInitialized = false;
     /* シェーダー関連 */

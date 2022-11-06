@@ -7,7 +7,6 @@ add_library(MD2Loader SHARED
         Renderer.h
         Md2Obj.cpp
         ShaderProgram.cpp
-        Texture2D.cpp
         TexObj.cpp)
 
 add_library(jni SHARED Jni.cpp)
