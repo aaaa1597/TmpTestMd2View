@@ -183,7 +183,7 @@ RetShaderAttribs GlObj::setAttribute(GLuint programId, int totalframes,
     GLuint retTexCoordAttrib = glGetAttribLocation( programId, "texCoord");
 
     /* 初期知設定 */
-    std::vector<float> wkMd2Vertices = {0};
+    std::vector<float> wkMd2Vertices = {};
     const size_t numPolys           = polyIndexs.size();
     const size_t numVertexsperframe = vertexs.size() / totalframes;
 

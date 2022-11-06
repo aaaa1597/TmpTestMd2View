@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include <tuple>
 #include <cstdio>
 #include <cstdlib>
 #include <GLES2/gl2.h>
@@ -19,7 +20,6 @@
 #define	MD2_VERSION 8                                           /* model version */
 
 class ShaderProgram;
-class Texture2D;
 
 struct MdlData {
     int numTotalFrames;
@@ -58,7 +58,7 @@ public:
     bool InitShaders(); /* シェーダをOpenGLで使えるようにする */
 
 private:
-    void InitBuffer();
+    std::tuple<bool, std::unordered_map<int, std::pair<int, int>>, GLuint>  InitBuffer();
 
 public:
     ShaderProgram       m_shaderProgram = {};

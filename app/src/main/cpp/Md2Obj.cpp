@@ -67,7 +67,9 @@ void Md2Model::setFileName(const char *md2FileName, const char *textureFileName)
 //	InitTexture();
 //	auto [boolret, progid] = m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 //	mProgramId = progid;
-	InitBuffer();
+	auto[retbool, frameindexes, vboid] = InitBuffer();
+ 	mFrameIndices = std::move(frameindexes);
+	mVboId = vboid;
 }
 
 void Md2Model::SetPosition(float x, float y, float z)
@@ -132,13 +134,18 @@ size_t Md2Model::GetEndFrame()
 	return mMdlData.numTotalFrames - 1;
 }
 
-void Md2Model::InitBuffer()
+std::tuple<bool, std::unordered_map<int, std::pair<int, int>>, GLuint> Md2Model::InitBuffer()
 {
+	/* 返却値 */
+	std::unordered_map<int, std::pair<int, int>> retAnimFrameS2e;
+	GLuint retVboId = -1;
+
 	mCurPosAttrib = glGetAttribLocation(mProgramId, "pos");
 	mNextPosAttrib = glGetAttribLocation(mProgramId, "nextPos");
 	mTexCoordAttrib = glGetAttribLocation(mProgramId, "texCoord");
 
-	std::vector<float> md2Vertices;
+	/* 初期知設定 */
+	std::vector<float> wkMd2Vertices;
 	const size_t startFrame = 0;
 	size_t endFrame = GetEndFrame();
 	vertex *currentFrame;
@@ -167,36 +174,36 @@ void Md2Model::InitBuffer()
 				for (size_t j = 0; j < 3; j++)
 				{
 					// vertices
-					md2Vertices.emplace_back(currentFrame[mMdlData.polyIndex[index].meshIndex[p]].v[j]);
+					wkMd2Vertices.emplace_back(currentFrame[mMdlData.polyIndex[index].meshIndex[p]].v[j]);
 				}
 
 				// next frame
 				for (size_t j = 0; j < 3; j++)
 				{
 					// vertices
-					md2Vertices.emplace_back(nextFrame[mMdlData.polyIndex[index].meshIndex[p]].v[j]);
+					wkMd2Vertices.emplace_back(nextFrame[mMdlData.polyIndex[index].meshIndex[p]].v[j]);
 				}
 
 				// tex coords
-				md2Vertices.emplace_back(mMdlData.st[mMdlData.polyIndex[index].stIndex[p]].s);
-				md2Vertices.emplace_back(mMdlData.st[mMdlData.polyIndex[index].stIndex[p]].t);
+				wkMd2Vertices.emplace_back(mMdlData.st[mMdlData.polyIndex[index].stIndex[p]].s);
+				wkMd2Vertices.emplace_back(mMdlData.st[mMdlData.polyIndex[index].stIndex[p]].t);
 				vertexIndex++;
 			}
 			// End of the vertex data
 		}
 
-		mFrameIndices[mMdlData.currentFrame] = {startVertex, vertexIndex - 1};
+		retAnimFrameS2e[mMdlData.currentFrame] = {startVertex, vertexIndex - 1};
 		mMdlData.currentFrame++;
 	}
 
 	size_t frameIndex = startFrame;
-	glGenBuffers(1, &mVboId); // Generate an empty vertex buffer on the GPU
+	glGenBuffers(1, &retVboId); // Generate an empty vertex buffer on the GPU
 
-	size_t count = mFrameIndices[frameIndex].second - mFrameIndices[frameIndex].first + 1;
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "count=%d (mFrameIndices[frameIndex].first * 8)=%d  %s %s(%d)", count, mFrameIndices[frameIndex].first * 8, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+	size_t count = retAnimFrameS2e[frameIndex].second - retAnimFrameS2e[frameIndex].first + 1;
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "count=%d (retAnimFrameS2e[frameIndex].first * 8)=%d  %s %s(%d)", count, retAnimFrameS2e[frameIndex].first * 8, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mVboId);																											   // "bind" or set as the current buffer we are working with
-	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * mMdlData.numTotalFrames, &md2Vertices[mFrameIndices[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
+	glBindBuffer(GL_ARRAY_BUFFER, retVboId);																											   // "bind" or set as the current buffer we are working with
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * mMdlData.numTotalFrames, &wkMd2Vertices[retAnimFrameS2e[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
 
 	// Current Frame Position attribute
 	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
@@ -209,9 +216,11 @@ void Md2Model::InitBuffer()
 	// Texture Coord attribute
 	glVertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(mTexCoordAttrib);
-	m_vboIndices.emplace_back(mVboId);
+	m_vboIndices.emplace_back(retVboId);
 	m_bufferInitialized = true;
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+
+	return {true, retAnimFrameS2e, retVboId};
 }
 
 bool Md2Model::LoadModel() {
