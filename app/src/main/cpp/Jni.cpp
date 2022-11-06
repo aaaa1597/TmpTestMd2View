@@ -18,10 +18,10 @@ extern "C" {
 
 std::map<std::string, Md2Model>       gMd2Models;     /* Md2モデルデータ実体 */
 std::mutex                            gMutex;         /* onStart()完了待ちmutex */
-GlobalSpaceObj                        gGlobalSpacePrm;/* グローバル空間パラメータ */
+extern GlobalSpaceObj gGlobalSpacePrm;/* グローバル空間パラメータ */
 std::chrono::system_clock::time_point gPreStartTime;/* 前回開始時刻 */
 
-static std::unique_ptr<Raydelto::MD2Loader::Renderer> pRenderer = std::make_unique<Raydelto::MD2Loader::Renderer>();
+static std::unique_ptr<Renderer> pRenderer = std::make_unique<Renderer>();
 
 /* onStart */
 JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(JNIEnv *env, jobject thiz, jobject assets,
@@ -134,9 +134,16 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
 
 
     gGlobalSpacePrm.mCameraPos = {0.0f, 0.0f, 0.0f};
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mCameraPos[0], gGlobalSpacePrm.mCameraPos[1], gGlobalSpacePrm.mCameraPos[2], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     gGlobalSpacePrm.mTargetPos = {0.0f, 0.0f, -20.0f};
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Target-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mTargetPos[0], gGlobalSpacePrm.mTargetPos[1], gGlobalSpacePrm.mTargetPos[2], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     gGlobalSpacePrm.mUpPos     = {1.0f, 0.0f, 0.0f};
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "UpPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mUpPos[0], gGlobalSpacePrm.mUpPos[1], gGlobalSpacePrm.mUpPos[2], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     gGlobalSpacePrm.mViewMat   = Mat44::getLookAtf(gGlobalSpacePrm.mCameraPos, gGlobalSpacePrm.mTargetPos, gGlobalSpacePrm.mUpPos);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "View-Mat[0](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mViewMat[ 0], gGlobalSpacePrm.mViewMat[ 1], gGlobalSpacePrm.mViewMat[ 2], gGlobalSpacePrm.mViewMat[ 3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "View-Mat[1](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mViewMat[ 4], gGlobalSpacePrm.mViewMat[ 5], gGlobalSpacePrm.mViewMat[ 6], gGlobalSpacePrm.mViewMat[ 7], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "View-Mat[2](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mViewMat[ 8], gGlobalSpacePrm.mViewMat[ 9], gGlobalSpacePrm.mViewMat[10], gGlobalSpacePrm.mViewMat[11], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "View-Mat[3](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mViewMat[12], gGlobalSpacePrm.mViewMat[13], gGlobalSpacePrm.mViewMat[14], gGlobalSpacePrm.mViewMat[15], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
     /* ビュー行列を更新したので再計算 */
     std::array<float, 16> vpmat = Mat44::multMatrixf(gGlobalSpacePrm.mProjectionMat, gGlobalSpacePrm.mViewMat);
