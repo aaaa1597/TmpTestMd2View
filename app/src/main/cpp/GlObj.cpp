@@ -194,21 +194,21 @@ RetShaderAttribs GlObj::setAttribute(GLuint programId, int totalframes,
         const vertex *nextFrame   = (frameidx+1 >= totalframes) ? &vertexs[0] : &vertexs[numVertexsperframe * (frameidx+1)];
 
         for(int plyidx = 0; plyidx < numPolys; plyidx++) {
-            for(int meshdx = 0; meshdx < 3; meshdx++) {
-                /* vertices */
+            for(int meshidx = 0; meshidx < 3; meshidx++) {
+                /* now frame */
                 for (size_t vidx = 0; vidx < 3; vidx++) {
-                    wkMd2Vertices.emplace_back(currentFrame[polyIndexs[plyidx].meshIndex[meshdx]].v[vidx]);
+                    wkMd2Vertices.emplace_back(currentFrame[polyIndexs[plyidx].meshIndex[meshidx]].v[vidx]);
                 }
 
                 /* next frame */
                 for (size_t vidx = 0; vidx < 3; vidx++) {
                     // vertices
-                    wkMd2Vertices.emplace_back(nextFrame[polyIndexs[plyidx].meshIndex[meshdx]].v[vidx]);
+                    wkMd2Vertices.emplace_back(nextFrame[polyIndexs[plyidx].meshIndex[meshidx]].v[vidx]);
                 }
 
                 /* tex coords */
-                wkMd2Vertices.emplace_back(sts[polyIndexs[plyidx].stIndex[meshdx]].s);
-                wkMd2Vertices.emplace_back(sts[polyIndexs[plyidx].stIndex[meshdx]].t);
+                wkMd2Vertices.emplace_back(sts[polyIndexs[plyidx].stIndex[meshidx]].s);
+                wkMd2Vertices.emplace_back(sts[polyIndexs[plyidx].stIndex[meshidx]].t);
             }
         }
 
@@ -217,18 +217,19 @@ RetShaderAttribs GlObj::setAttribute(GLuint programId, int totalframes,
         retAnimFrameS2e[frameidx] = {startverindex, endverindex};
     }
 
-    size_t numVertexs = numPolys * 3 + 1;
+    size_t numVertexs = numPolys * 3;
     glGenBuffers(1, &retVboId);
 
     glBindBuffer(GL_ARRAY_BUFFER, retVboId);
     glBufferData(GL_ARRAY_BUFFER, numVertexs * sizeof(float) * 8 * totalframes, &wkMd2Vertices[0], GL_STATIC_DRAW);
 
     glVertexAttribPointer(retCurPosAttrib  , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)nullptr);
-    glVertexAttribPointer(retNextPosAttrib , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-    glVertexAttribPointer(retTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-
     glEnableVertexAttribArray(retCurPosAttrib);
+
+    glVertexAttribPointer(retNextPosAttrib , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
     glEnableVertexAttribArray(retNextPosAttrib);
+
+    glVertexAttribPointer(retTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
     glEnableVertexAttribArray(retTexCoordAttrib);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);

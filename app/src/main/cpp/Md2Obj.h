@@ -60,11 +60,10 @@ public:
     bool InitShaders(); /* シェーダをOpenGLで使えるようにする */
 
 private:
-    RetShaderAttribs2 InitBuffer(GLuint programId, int totalframes);
+    RetShaderAttribs2 InitBuffer(GLuint programId, int totalframes, const std::vector<vertex> &vertexs, const std::vector<mesh> &polyIndexs,const std::vector<texstcoord> &sts);
 
 public:
     ShaderProgram       m_shaderProgram = {};
-    std::vector<GLuint> m_vboIndices = {};
 
 public:
     std::string         mName = {0};
@@ -77,13 +76,12 @@ public:
     std::vector<char>   mWkRgbaData = {0};
     /* 描画に必要なデータ */
     MdlData                 mMdlData = {0};
-    glm::vec3 m_position = glm::vec3(0.0f, 0.0f, -25.0f);
+    glm::vec3               mPosition = glm::vec3(0.0f, 0.0f, -25.0f);
     /* アニメ関連 */
     std::unordered_map<int, std::pair<int, int>> mFrameIndices = {};
     /* テクスチャ関連 */
     GLuint mTexId = -1;
     bool m_textureLoaded = false;
-    bool m_bufferInitialized = false;
     /* シェーダー関連 */
     GLuint mVboId         = -1;
     GLuint mProgramId     = -1;

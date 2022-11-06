@@ -128,7 +128,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
     if(!ret)
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::InitModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
-    pRenderer->OnSurfaceCreated(gMd2Models);
+    gMd2Models.at("grunt").SetPosition(0.0f, 6.5f, -25.0f);
 
     gMutex.unlock();
     return;

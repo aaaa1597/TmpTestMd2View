@@ -9,15 +9,15 @@ Renderer::Renderer() = default;
 
 void Renderer::OnSurfaceCreated(std::map<std::string, Md2Model> &md2models)
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.12f, 0.0f, 0.4f);
 
     Md2Model *m_player = &md2models.at("female");
     Md2Model *m_player2= &md2models.at("grunt");
 
 //    m_player = std::make_unique<Md2Model>(/*"female.md2", "female.tga"*/);
-    m_player->setFileName("female.md2","female.tga");
+//    m_player->setFileName("female.md2","female.tga");
 //    m_player2 = std::make_unique<Md2Model>(/*"grunt.md2", "grunt.tga"*/);
-    m_player2->setFileName("grunt.md2","grunt.tga");
+//    m_player2->setFileName("grunt.md2","grunt.tga");
     m_player2->SetPosition(0.0f, 6.5f, -25.0f);
 }
 

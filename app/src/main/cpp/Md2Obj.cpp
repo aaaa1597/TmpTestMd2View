@@ -67,7 +67,8 @@ void Md2Model::setFileName(const char *md2FileName, const char *textureFileName)
 //	InitTexture();
 //	auto [boolret, progid] = m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 //	mProgramId = progid;
-	auto[retbool, frameindexes, vboid, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = InitBuffer(mProgramId, mMdlData.numTotalFrames);
+//	auto[retbool, frameindexes, vboid, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = InitBuffer(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
+	auto[retbool, frameindexes, vboid, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = GlObj::setAttribute(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
  	mFrameIndices  = std::move(frameindexes);
 	mVboId         = vboid;
 	mCurPosAttrib  = retCurPosAttrib;
@@ -75,23 +76,19 @@ void Md2Model::setFileName(const char *md2FileName, const char *textureFileName)
 	mTexCoordAttrib= retTexCoordAttrib;
 }
 
-void Md2Model::SetPosition(float x, float y, float z)
-{
-    m_position = glm::vec3(x,y,z);
+void Md2Model::SetPosition(float x, float y, float z) {
+	mPosition = glm::vec3(x, y, z);
 }
 
 Md2Model::~Md2Model()
 {
-	for (size_t i = 0; i < m_vboIndices.size(); i++)
-	{
-		glDeleteBuffers(1, &m_vboIndices[i]);
-	}
+	glDeleteBuffers(1, &mVboId);
 }
 
 void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection)
 {
 	glEnable(GL_DEPTH_TEST);
-	assert(m_textureLoaded && m_bufferInitialized);
+	assert(m_textureLoaded);
 
 	/* TODO 移動予定 glActiveTexture() → glBindTexture() */
 	GlObj::activeTexture(GL_TEXTURE0);
@@ -99,11 +96,11 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 
 	glm::mat4 model;
 
-	model = glm::translate(model, m_position) *
-	        glm::rotate(model, glm::radians(yAngle), glm::vec3(0.0f, 1.0f, 0.0f)) *
-	        glm::rotate(model, glm::radians(xAngle), glm::vec3(1.0f, 0.0f, 0.0f)) *
-	        glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
-	        glm::scale(model, glm::vec3(0.3 * scale, 0.3 * scale, 0.3 * scale));
+	model = glm::translate(model, mPosition) *
+			glm::rotate(model, glm::radians(yAngle), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			glm::rotate(model, glm::radians(xAngle), glm::vec3(1.0f, 0.0f, 0.0f)) *
+			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			glm::scale(model, glm::vec3(0.3 * scale, 0.3 * scale, 0.3 * scale));
 
 	GlObj::useProgram(mProgramId);
 //	m_shaderProgram.Use();
@@ -137,71 +134,55 @@ size_t Md2Model::GetEndFrame()
 	return mMdlData.numTotalFrames - 1;
 }
 
-RetShaderAttribs2 Md2Model::InitBuffer(GLuint programId, int totalframes) {
+RetShaderAttribs2 Md2Model::InitBuffer(GLuint programId, int totalframes,
+									   const std::vector<vertex> &vertexs, const std::vector<mesh> &polyIndexs,const std::vector<texstcoord> &sts) {
 	/* 返却値 */
 	std::unordered_map<int, std::pair<int, int>> retAnimFrameS2e;
 	GLuint retVboId = -1;
-	GLuint retCurPosAttrib  = glGetAttribLocation(mProgramId, "pos");
-	GLuint retNextPosAttrib = glGetAttribLocation(mProgramId, "nextPos");
-	GLuint retTexCoordAttrib= glGetAttribLocation(mProgramId, "texCoord");
+	GLuint retCurPosAttrib  = glGetAttribLocation(programId, "pos");
+	GLuint retNextPosAttrib = glGetAttribLocation(programId, "nextPos");
+	GLuint retTexCoordAttrib= glGetAttribLocation(programId, "texCoord");
 
 	/* 初期知設定 */
 	std::vector<float> wkMd2Vertices = {};
-	const size_t startFrame = 0;
-	size_t endFrame = GetEndFrame();
-	vertex *currentFrame;
-	vertex *nextFrame;
+	const size_t numPolys           = polyIndexs.size();
+	const size_t numVertexsperframe = vertexs.size() / totalframes;
+
 	mMdlData.interpol = 0.0f;
-
-	size_t vertexIndex = 0;
-	size_t startVertex = 0;
-
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d numPoly=%d numVertexsperframe=%d %s %s(%d)", endFrame, mMdlData.numPolys, mMdlData.numVertexsPerFrame, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	// fill buffer
 	for(int frameidx = 0; frameidx < totalframes; frameidx++) {
-		currentFrame = &mMdlData.vertexList[mMdlData.numVertexsPerFrame * frameidx];
-		nextFrame = frameidx == endFrame ? &mMdlData.vertexList[mMdlData.numVertexsPerFrame * startFrame] : &mMdlData.vertexList[mMdlData.numVertexsPerFrame * (frameidx + 1)];
-		startVertex = vertexIndex;
-		for (size_t index = 0; index < mMdlData.numPolys; index++)
-		{
+		const vertex *currentFrame= &vertexs[numVertexsperframe * frameidx];
+		const vertex *nextFrame   = (frameidx+1 >= totalframes) ? &vertexs[0] : &vertexs[numVertexsperframe * (frameidx+1)];
 
-			// Start of the vertex data
-			for (size_t p = 0; p < 3; p++)
-			{
-				// current frame
-				for (size_t j = 0; j < 3; j++)
-				{
-					// vertices
-					wkMd2Vertices.emplace_back(currentFrame[mMdlData.polyIndex[index].meshIndex[p]].v[j]);
+		for (size_t plyidx = 0; plyidx < numPolys; plyidx++) {
+			for (size_t meshidx = 0; meshidx < 3; meshidx++) {
+				/* now frame */
+				for (size_t vidx = 0; vidx < 3; vidx++) {
+					wkMd2Vertices.emplace_back(currentFrame[polyIndexs[plyidx].meshIndex[meshidx]].v[vidx]);
 				}
 
-				// next frame
-				for (size_t j = 0; j < 3; j++)
-				{
-					// vertices
-					wkMd2Vertices.emplace_back(nextFrame[mMdlData.polyIndex[index].meshIndex[p]].v[j]);
+				/* next frame */
+				for (size_t vidx = 0; vidx < 3; vidx++) {
+					wkMd2Vertices.emplace_back(nextFrame[polyIndexs[plyidx].meshIndex[meshidx]].v[vidx]);
 				}
 
-				// tex coords
-				wkMd2Vertices.emplace_back(mMdlData.st[mMdlData.polyIndex[index].stIndex[p]].s);
-				wkMd2Vertices.emplace_back(mMdlData.st[mMdlData.polyIndex[index].stIndex[p]].t);
-				vertexIndex++;
+				/* tex coords */
+				wkMd2Vertices.emplace_back(mMdlData.st[polyIndexs[plyidx].stIndex[meshidx]].s);
+				wkMd2Vertices.emplace_back(mMdlData.st[polyIndexs[plyidx].stIndex[meshidx]].t);
 			}
-			// End of the vertex data
 		}
 
-		retAnimFrameS2e[frameidx] = {startVertex, vertexIndex - 1};
+		int startverindex= (frameidx==0) ? 0 : retAnimFrameS2e[frameidx-1].second + 1;
+		int endverindex  = ((frameidx+1) * numPolys * 3) - 1;
+		retAnimFrameS2e[frameidx] = {startverindex, endverindex};
 	}
 
-	size_t frameIndex = startFrame;
+	size_t numVertexs = numPolys * 3;
 	glGenBuffers(1, &retVboId); // Generate an empty vertex buffer on the GPU
 
-	size_t count = retAnimFrameS2e[frameIndex].second - retAnimFrameS2e[frameIndex].first + 1;
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "count=%d (retAnimFrameS2e[frameIndex].first * 8)=%d  %s %s(%d)", count, retAnimFrameS2e[frameIndex].first * 8, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-
 	glBindBuffer(GL_ARRAY_BUFFER, retVboId);																											   // "bind" or set as the current buffer we are working with
-	glBufferData(GL_ARRAY_BUFFER, count * sizeof(float) * 8 * mMdlData.numTotalFrames, &wkMd2Vertices[retAnimFrameS2e[frameIndex].first * 8], GL_STATIC_DRAW); // copy the data from CPU to GPU
+	glBufferData(GL_ARRAY_BUFFER, numVertexs * sizeof(float) * 8 * totalframes, &wkMd2Vertices[0], GL_STATIC_DRAW); // copy the data from CPU to GPU
 
 	// Current Frame Position attribute
 	glVertexAttribPointer(retCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
@@ -214,8 +195,7 @@ RetShaderAttribs2 Md2Model::InitBuffer(GLuint programId, int totalframes) {
 	// Texture Coord attribute
 	glVertexAttribPointer(retTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(retTexCoordAttrib);
-	m_vboIndices.emplace_back(retVboId);
-	m_bufferInitialized = true;
+
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 
 	return {true, retAnimFrameS2e, retVboId, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib};
@@ -335,19 +315,19 @@ bool Md2Model::InitShaders() {
     }
     mProgramId = progid;
 
-//    /* シェーダのAttributeにデータ一括設定 */
-//    auto[retbool, retAnimFrameS2e, retVboID, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = GlObj::setAttribute(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
-//    if( !retbool) {
-//        GlObj::DeleteShaders(mProgramId);
-//        mProgramId =-1;
-//        return false;
-//    }
-//
-//    mFrameIndices  = std::move(retAnimFrameS2e);
-//    mVboId         = retVboID;
-//    mCurPosAttrib  = retCurPosAttrib;
-//    mNextPosAttrib = retNextPosAttrib;
-//    mTexCoordAttrib= retTexCoordAttrib;
+    /* シェーダのAttributeにデータ一括設定 */
+    auto[retbool, retAnimFrameS2e, retVboID, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = GlObj::setAttribute(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
+    if( !retbool) {
+        GlObj::DeleteShaders(mProgramId);
+        mProgramId =-1;
+        return false;
+    }
+
+    mFrameIndices  = std::move(retAnimFrameS2e);
+    mVboId         = retVboID;
+    mCurPosAttrib  = retCurPosAttrib;
+    mNextPosAttrib = retNextPosAttrib;
+    mTexCoordAttrib= retTexCoordAttrib;
 
     return true;
 }
