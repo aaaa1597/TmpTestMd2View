@@ -13,6 +13,7 @@ void Renderer::OnSurfaceChanged(int width, int height) {
     // Create the projection matrix
     float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
     m_projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+
     m_camPos = glm::vec3(0.0f, 0.0f, 0.0f);
     m_targetPos = glm::vec3(0.0f, 0.0f, -20.0f);
     m_up = glm::vec3(1.0f, 0.0f, 0.0f);

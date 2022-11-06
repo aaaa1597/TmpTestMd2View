@@ -9,6 +9,7 @@
 #include <android/asset_manager_jni.h>
 #include "Md2Obj.h"
 #include "GlObj.h"
+#include "GlobalSpaceObj.h"
 #include "Renderer.h"
 
 #ifdef __cplusplus
@@ -17,6 +18,7 @@ extern "C" {
 
 std::map<std::string, Md2Model>       gMd2Models;     /* Md2モデルデータ実体 */
 std::mutex                            gMutex;         /* onStart()完了待ちmutex */
+GlobalSpaceObj                        gGlobalSpacePrm;/* グローバル空間パラメータ */
 std::chrono::system_clock::time_point gPreStartTime;/* 前回開始時刻 */
 
 static std::unique_ptr<Raydelto::MD2Loader::Renderer> pRenderer = std::make_unique<Raydelto::MD2Loader::Renderer>();
