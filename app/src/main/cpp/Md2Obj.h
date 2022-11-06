@@ -41,6 +41,8 @@ struct MdlData {
     float speed;
 };
 
+using RetShaderAttribs2 = std::tuple<bool, std::unordered_map<int, std::pair<int, int>>, GLuint, GLuint, GLuint, GLuint>;
+
 class Md2Model {
 public:
 //    Md2Model(const char *md2FileName, const char *textureFileName);
@@ -58,7 +60,7 @@ public:
     bool InitShaders(); /* シェーダをOpenGLで使えるようにする */
 
 private:
-    std::tuple<bool, std::unordered_map<int, std::pair<int, int>>, GLuint>  InitBuffer();
+    RetShaderAttribs2 InitBuffer();
 
 public:
     ShaderProgram       m_shaderProgram = {};
