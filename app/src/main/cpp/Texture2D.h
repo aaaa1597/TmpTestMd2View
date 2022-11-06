@@ -10,7 +10,6 @@ class Texture2D
 public:
 	Texture2D();
 	virtual ~Texture2D();
-	std::tuple<bool, int, int, unsigned char*> LoadTexture(const std::string &fileName, bool generateMipMaps = true);
 	bool InitTexture(int w, int h, unsigned char *rgbabindata);
 	void Bind(GLuint texUnit = 0) const;
 

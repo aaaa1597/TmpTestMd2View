@@ -16,17 +16,6 @@ Texture2D::~Texture2D()
 	glDeleteTextures(1, &mTexture);
 }
 
-std::tuple<bool, int, int, unsigned char*> Texture2D::LoadTexture(const string &fileName, bool generateMipMaps)
-{
-	int width;
-	int height;
-	int components;
-
-	// Use stbi image library to load our image
-	unsigned char *rgbbindata = stbi_load(fileName.c_str(), &width, &height, &components, STBI_rgb_alpha);
-	return {true, width, height, rgbbindata};
-}
-
 bool Texture2D::InitTexture(int w, int h, unsigned char *rgbabindata)
 {
 	if (rgbabindata == nullptr)

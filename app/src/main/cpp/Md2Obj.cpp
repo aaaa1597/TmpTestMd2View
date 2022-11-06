@@ -122,17 +122,6 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
-bool Md2Model::InitTexture() {
-	m_texture.InitTexture(mWkWidth, mWkHeight,
-						  reinterpret_cast<unsigned char*>(mWkRgbaData.data()));
-	mWkWidth = -1;
-	mWkHeight = -1;
-//	std::vector<char>().swap(mWkRgbaData);
-	m_textureLoaded = true;
-
-	return true;
-}
-
 size_t Md2Model::GetEndFrame()
 {
 	return mMdlData.numTotalFrames - 1;
@@ -306,6 +295,21 @@ bool Md2Model::LoadTexture() {
 							__PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 	}
 	return retbool;
+}
+
+/* TextureデータをOpenGLで使えるようにする */
+bool Md2Model::InitTexture() {
+    /* OpenGLのTexture初期化 */
+	m_texture.InitTexture(mWkWidth, mWkHeight,
+						  reinterpret_cast<unsigned char*>(mWkRgbaData.data()));
+
+    /* 解放処理 */
+    mWkWidth = 0;
+    mWkHeight= 0;
+//	std::vector<char>().swap(mWkRgbaData);
+	m_textureLoaded = true;
+
+    return true;
 }
 
 /* シェーダをOpenGLで使えるようにする */
