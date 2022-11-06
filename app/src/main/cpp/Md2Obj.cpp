@@ -67,7 +67,7 @@ void Md2Model::setFileName(const char *md2FileName, const char *textureFileName)
 //	InitTexture();
 //	auto [boolret, progid] = m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 //	mProgramId = progid;
-	auto[retbool, frameindexes, vboid, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = InitBuffer();
+	auto[retbool, frameindexes, vboid, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = InitBuffer(mProgramId, mMdlData.numTotalFrames);
  	mFrameIndices  = std::move(frameindexes);
 	mVboId         = vboid;
 	mCurPosAttrib  = retCurPosAttrib;
@@ -137,8 +137,7 @@ size_t Md2Model::GetEndFrame()
 	return mMdlData.numTotalFrames - 1;
 }
 
-RetShaderAttribs2 Md2Model::InitBuffer()
-{
+RetShaderAttribs2 Md2Model::InitBuffer(GLuint programId, int totalframes) {
 	/* 返却値 */
 	std::unordered_map<int, std::pair<int, int>> retAnimFrameS2e;
 	GLuint retVboId = -1;
@@ -147,12 +146,11 @@ RetShaderAttribs2 Md2Model::InitBuffer()
 	GLuint retTexCoordAttrib= glGetAttribLocation(mProgramId, "texCoord");
 
 	/* 初期知設定 */
-	std::vector<float> wkMd2Vertices;
+	std::vector<float> wkMd2Vertices = {};
 	const size_t startFrame = 0;
 	size_t endFrame = GetEndFrame();
 	vertex *currentFrame;
 	vertex *nextFrame;
-	mMdlData.currentFrame = startFrame;
 	mMdlData.interpol = 0.0f;
 
 	size_t vertexIndex = 0;
@@ -161,10 +159,9 @@ RetShaderAttribs2 Md2Model::InitBuffer()
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "endFrame=%d numPoly=%d numVertexsperframe=%d %s %s(%d)", endFrame, mMdlData.numPolys, mMdlData.numVertexsPerFrame, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
 	// fill buffer
-	while (mMdlData.currentFrame <= endFrame)
-	{
-		currentFrame = &mMdlData.vertexList[mMdlData.numVertexsPerFrame * mMdlData.currentFrame];
-		nextFrame = mMdlData.currentFrame == endFrame ? &mMdlData.vertexList[mMdlData.numVertexsPerFrame * startFrame] : &mMdlData.vertexList[mMdlData.numVertexsPerFrame * (mMdlData.currentFrame + 1)];
+	for(int frameidx = 0; frameidx < totalframes; frameidx++) {
+		currentFrame = &mMdlData.vertexList[mMdlData.numVertexsPerFrame * frameidx];
+		nextFrame = frameidx == endFrame ? &mMdlData.vertexList[mMdlData.numVertexsPerFrame * startFrame] : &mMdlData.vertexList[mMdlData.numVertexsPerFrame * (frameidx + 1)];
 		startVertex = vertexIndex;
 		for (size_t index = 0; index < mMdlData.numPolys; index++)
 		{
@@ -194,8 +191,7 @@ RetShaderAttribs2 Md2Model::InitBuffer()
 			// End of the vertex data
 		}
 
-		retAnimFrameS2e[mMdlData.currentFrame] = {startVertex, vertexIndex - 1};
-		mMdlData.currentFrame++;
+		retAnimFrameS2e[frameidx] = {startVertex, vertexIndex - 1};
 	}
 
 	size_t frameIndex = startFrame;

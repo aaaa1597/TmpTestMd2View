@@ -60,7 +60,7 @@ public:
     bool InitShaders(); /* シェーダをOpenGLで使えるようにする */
 
 private:
-    RetShaderAttribs2 InitBuffer();
+    RetShaderAttribs2 InitBuffer(GLuint programId, int totalframes);
 
 public:
     ShaderProgram       m_shaderProgram = {};
