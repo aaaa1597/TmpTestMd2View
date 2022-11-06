@@ -247,3 +247,11 @@ void GlObj::bindTexture(GLenum target, GLuint textureid) {
 void GlObj::deleteTextures(GLsizei size, const GLuint *textures) {
     glDeleteTextures(size, textures);
 }
+
+void GlObj::useProgram(GLuint progId) {
+    glUseProgram(progId);
+}
+
+void GlObj::deleteProgram(GLuint progid) {
+    glDeleteProgram(progid);
+}

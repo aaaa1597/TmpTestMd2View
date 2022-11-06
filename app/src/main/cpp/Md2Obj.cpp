@@ -65,7 +65,8 @@ void Md2Model::setFileName(const char *md2FileName, const char *textureFileName)
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 //	LoadTexture(BASE_PATH + std::string(textureFileName));
 //	InitTexture();
-	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
+	auto [boolret, progid] = m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
+	mProgramId = progid;
 	InitBuffer();
 }
 
@@ -99,7 +100,8 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 	        glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
 	        glm::scale(model, glm::vec3(0.3 * scale, 0.3 * scale, 0.3 * scale));
 
-	m_shaderProgram.Use();
+	GlObj::useProgram(mProgramId);
+//	m_shaderProgram.Use();
 //	m_shaderProgram->SetUniform("model", model);
 //	m_shaderProgram->SetUniform("view", view);
 //	m_shaderProgram->SetUniform("projection", projection);
@@ -111,11 +113,11 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 	/* ↑これOK ここまで */
 	/* ↓これもOK ここから */
     const glm::mat4 &vpmat = projection * view;
-    m_shaderProgram.SetUniform("mvpmat", vpmat * model);
+    m_shaderProgram.SetUniform(mProgramId, "mvpmat", vpmat * model);
 	/* ↑これもOK ここまで */
 
 	auto count = mFrameIndices[frame].second - mFrameIndices[frame].first + 1;
-	m_shaderProgram.SetUniform("interpolation", interpolation);
+	m_shaderProgram.SetUniform(mProgramId,"interpolation", interpolation);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVboId);
 	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
@@ -132,9 +134,9 @@ size_t Md2Model::GetEndFrame()
 
 void Md2Model::InitBuffer()
 {
-	mCurPosAttrib = glGetAttribLocation(m_shaderProgram.GetProgram(), "pos");
-	mNextPosAttrib = glGetAttribLocation(m_shaderProgram.GetProgram(), "nextPos");
-	mTexCoordAttrib = glGetAttribLocation(m_shaderProgram.GetProgram(), "texCoord");
+	mCurPosAttrib = glGetAttribLocation(mProgramId, "pos");
+	mNextPosAttrib = glGetAttribLocation(mProgramId, "nextPos");
+	mTexCoordAttrib = glGetAttribLocation(mProgramId, "texCoord");
 
 	std::vector<float> md2Vertices;
 	const size_t startFrame = 0;

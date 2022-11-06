@@ -14,11 +14,12 @@ ShaderProgram::ShaderProgram()
 
 ShaderProgram::~ShaderProgram()
 {
-	glDeleteProgram(mHandle);
+//	glDeleteProgram(mHandle);
 }
 
-bool ShaderProgram::LoadShaders(std::string vsFilename, std::string fsFilename)
+std::tuple<bool, GLuint> ShaderProgram::LoadShaders(std::string vsFilename, std::string fsFilename)
 {
+	GLuint retProgId = -1;
 
 	string vsString = FileToString(vsFilename.c_str());
 	string fsString = FileToString(fsFilename.c_str());
@@ -37,24 +38,24 @@ bool ShaderProgram::LoadShaders(std::string vsFilename, std::string fsFilename)
 	glCompileShader(fs);
 	CheckCompileErrors(fs, ShaderType::FRAGMENT);
 
-	mHandle = glCreateProgram();
-	if (mHandle == 0)
+	retProgId = glCreateProgram();
+	if (retProgId == 0)
 	{
 		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "Unable to create shader program! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-		return false;
+		return {false, retProgId};
 	}
 
-	glAttachShader(mHandle, vs);
-	glAttachShader(mHandle, fs);
+	glAttachShader(retProgId, vs);
+	glAttachShader(retProgId, fs);
 
-	glLinkProgram(mHandle);
-	CheckCompileErrors(mHandle, ShaderType::PROGRAM);
+	glLinkProgram(retProgId);
+	CheckCompileErrors(retProgId, ShaderType::PROGRAM);
 
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
 	mUniformLocations.clear();
-	return true;
+	return {true, retProgId};
 }
 
 string ShaderProgram::FileToString(const string &filename)
@@ -83,10 +84,10 @@ string ShaderProgram::FileToString(const string &filename)
 
 void ShaderProgram::Use() const
 {
-	if (mHandle > 0)
-	{
-		glUseProgram(mHandle);
-	}
+//	if (mHandle > 0)
+//	{
+//		glUseProgram(mHandle);
+//	}
 }
 
 void ShaderProgram::CheckCompileErrors(GLuint shader, ShaderType type)
@@ -123,48 +124,48 @@ void ShaderProgram::CheckCompileErrors(GLuint shader, ShaderType type)
 	}
 }
 
-GLuint ShaderProgram::GetProgram() const
-{
-	return mHandle;
-}
+//GLuint ShaderProgram::GetProgram() const
+//{
+//	return mHandle;
+//}
 
-void ShaderProgram::SetUniform(const GLchar *name, const float &f)
+void ShaderProgram::SetUniform(GLuint progId, const GLchar *name, const float &f)
 {
-	GLint loc = GetUniformLocation(name);
+	GLint loc = GetUniformLocation(progId, name);
 	glUniform1f(loc, f);
 }
 
-void ShaderProgram::SetUniform(const GLchar *name, const glm::vec2 &v)
+void ShaderProgram::SetUniform(GLuint progId, const GLchar *name, const glm::vec2 &v)
 {
-	GLint loc = GetUniformLocation(name);
+	GLint loc = GetUniformLocation(progId, name);
 	glUniform2f(loc, v.x, v.y);
 }
 
-void ShaderProgram::SetUniform(const GLchar *name, const glm::vec3 &v)
+void ShaderProgram::SetUniform(GLuint progId, const GLchar *name, const glm::vec3 &v)
 {
-	GLint loc = GetUniformLocation(name);
+	GLint loc = GetUniformLocation(progId, name);
 	glUniform3f(loc, v.x, v.y, v.z);
 }
 
-void ShaderProgram::SetUniform(const GLchar *name, const glm::vec4 &v)
+void ShaderProgram::SetUniform(GLuint progId, const GLchar *name, const glm::vec4 &v)
 {
-	GLint loc = GetUniformLocation(name);
+	GLint loc = GetUniformLocation(progId, name);
 	glUniform4f(loc, v.x, v.y, v.z, v.w);
 }
 
-void ShaderProgram::SetUniform(const GLchar *name, const glm::mat4 &m)
+void ShaderProgram::SetUniform(GLuint progId, const GLchar *name, const glm::mat4 &m)
 {
-	GLint loc = GetUniformLocation(name);
+	GLint loc = GetUniformLocation(progId, name);
 	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(m));
 }
 
-GLint ShaderProgram::GetUniformLocation(const GLchar *name)
+GLint ShaderProgram::GetUniformLocation(GLuint progId, const GLchar *name)
 {
 	auto it = mUniformLocations.find(name);
 
 	if (it == mUniformLocations.end())
 	{
-		mUniformLocations[name] = glGetUniformLocation(mHandle, name);
+		mUniformLocations[name] = glGetUniformLocation(progId, name);
 	}
 
 	return mUniformLocations[name];

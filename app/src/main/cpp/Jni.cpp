@@ -3,6 +3,7 @@
 #include <map>
 #include <mutex>
 #include <chrono>
+#include <tuple>
 #include <jni.h>
 #include <android/log.h>
 #include <android/asset_manager_jni.h>
@@ -149,15 +150,26 @@ Java_com_tks_cppmd2viewer_Jni_00024Companion_onStop(JNIEnv *env, jobject thiz) {
 
     /* glDeleteTextures() */
     const std::map<std::string, Md2Model> &md2models = gMd2Models;
-    const std::vector<unsigned int> &texids = []() {
-                                                        std::vector<unsigned int> retvec = {};
-                                                        retvec.reserve(md2models.size());
+    const std::tuple<std::vector<unsigned int>, std::vector<unsigned int>> &ids = []() {
+                                                        std::vector<unsigned int> rettexids = {};
+                                                        std::vector<unsigned int> retprogids = {};
+                                                        rettexids.reserve(md2models.size());
+                                                        retprogids.reserve(md2models.size());
                                                         for(auto &[key, value] : md2models) {
-                                                            retvec.push_back(value.mTexId);
+                                                            rettexids.push_back(value.mTexId);
+                                                            retprogids.push_back(value.mProgramId);
                                                         }
-                                                        return retvec;
+                                                        return std::make_tuple(rettexids, retprogids);
                                                     }();
+    /* テクスチャ解放 */
+    const std::vector<unsigned int> &texids = std::get<0>(ids);
     GlObj::deleteTextures((GLsizei)texids.size(), texids.data());
+
+    /* シェーダ解放 */
+    const std::vector<unsigned int> &progids= std::get<1>(ids);
+    for(unsigned int progid : progids) {
+        GlObj::deleteProgram(progid);
+    }
 
     return;
 }

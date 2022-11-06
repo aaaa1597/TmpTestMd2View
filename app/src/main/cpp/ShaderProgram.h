@@ -13,16 +13,16 @@ public:
 	ShaderProgram();
 	~ShaderProgram();
 
-	bool LoadShaders(std::string vsFilename, std::string fsFilename);
+	std::tuple<bool, GLuint> LoadShaders(std::string vsFilename, std::string fsFilename);
 	void Use() const;
 
-	void SetUniform(const GLchar *name, const float &f);
-	void SetUniform(const GLchar *name, const glm::vec2 &v);
-	void SetUniform(const GLchar *name, const glm::vec3 &v);
-	void SetUniform(const GLchar *name, const glm::vec4 &v);
-	void SetUniform(const GLchar *name, const glm::mat4 &m);
+	void SetUniform(GLuint progId, const GLchar *name, const float &f);
+	void SetUniform(GLuint progId, const GLchar *name, const glm::vec2 &v);
+	void SetUniform(GLuint progId, const GLchar *name, const glm::vec3 &v);
+	void SetUniform(GLuint progId, const GLchar *name, const glm::vec4 &v);
+	void SetUniform(GLuint progId, const GLchar *name, const glm::mat4 &m);
 
-	GLint GetUniformLocation(const GLchar *name);
+	GLint GetUniformLocation(GLuint progId, const GLchar *name);
 	GLuint GetProgram() const;
 
 private:
@@ -36,6 +36,6 @@ private:
 	std::string FileToString(const std::string &filename);
 	void CheckCompileErrors(GLuint shader, ShaderType type);
 
-	GLuint mHandle = 0;
+//	GLuint mHandle = 0;
 	std::unordered_map<std::string, GLint> mUniformLocations;
 };
