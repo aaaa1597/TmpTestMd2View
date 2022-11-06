@@ -36,9 +36,9 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
         bool ret2 = value.InitTexture();
         std::vector<char>().swap(value.mWkTexBinData);
         if( !ret2) return false;
-//      /* シェーダ初期化 */
-//      bool ret3 = value.InitShaders();
-//      if( !ret3) return false;
+      /* シェーダ初期化 */
+      bool ret3 = value.InitShaders();
+      if( !ret3) return false;
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Shader Init end(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     }
     return true;
@@ -65,8 +65,8 @@ void Md2Model::setFileName(const char *md2FileName, const char *textureFileName)
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 //	LoadTexture(BASE_PATH + std::string(textureFileName));
 //	InitTexture();
-	auto [boolret, progid] = m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
-	mProgramId = progid;
+//	auto [boolret, progid] = m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
+//	mProgramId = progid;
 	InitBuffer();
 }
 
@@ -328,19 +328,19 @@ bool Md2Model::InitShaders() {
     }
     mProgramId = progid;
 
-    /* シェーダのAttributeにデータ一括設定 */
-    auto[retbool, retAnimFrameS2e, retVboID, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = GlObj::setAttribute(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
-    if( !retbool) {
-        GlObj::DeleteShaders(mProgramId);
-        mProgramId =-1;
-        return false;
-    }
-
-    mFrameIndices  = std::move(retAnimFrameS2e);
-    mVboId         = retVboID;
-    mCurPosAttrib  = retCurPosAttrib;
-    mNextPosAttrib = retNextPosAttrib;
-    mTexCoordAttrib= retTexCoordAttrib;
+//    /* シェーダのAttributeにデータ一括設定 */
+//    auto[retbool, retAnimFrameS2e, retVboID, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = GlObj::setAttribute(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
+//    if( !retbool) {
+//        GlObj::DeleteShaders(mProgramId);
+//        mProgramId =-1;
+//        return false;
+//    }
+//
+//    mFrameIndices  = std::move(retAnimFrameS2e);
+//    mVboId         = retVboID;
+//    mCurPosAttrib  = retCurPosAttrib;
+//    mNextPosAttrib = retNextPosAttrib;
+//    mTexCoordAttrib= retTexCoordAttrib;
 
     return true;
 }
