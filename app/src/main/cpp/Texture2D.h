@@ -10,7 +10,6 @@ class Texture2D
 public:
 	Texture2D();
 	virtual ~Texture2D();
-	GLuint InitTexture(int w, int h, unsigned char *rgbabindata);
 	void Bind(GLuint texUnit, GLuint texture) const;
 
 //private:

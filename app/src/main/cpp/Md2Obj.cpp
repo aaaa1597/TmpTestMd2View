@@ -87,7 +87,11 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 {
 	glEnable(GL_DEPTH_TEST);
 	assert(m_textureLoaded && m_bufferInitialized);
-	m_texture.Bind(0, mTexId);
+
+	/* TODO 移動予定 glActiveTexture() → glBindTexture() */
+	GlObj::activeTexture(GL_TEXTURE0);
+	GlObj::bindTexture(GL_TEXTURE_2D, mTexId);
+
 	glm::mat4 model;
 
 	model = glm::translate(model, m_position) *
