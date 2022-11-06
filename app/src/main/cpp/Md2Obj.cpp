@@ -31,15 +31,15 @@ bool Md2Obj::LoadModel(std::map<std::string, Md2Model> &md2models) {
 /* Md2モデル初期化(特にOpenGL系は、onSurfaceCreated()ドリブンで動作しないとエラーになる) */
 bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
     for(auto &[key, value] : md2models) {
-//        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model Init start (%s). %s %s(%d)", value.mName.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-//        /* テクスチャInit */
-//        bool ret2 = value.InitTexture();
-//        std::vector<char>().swap(value.mWkTexBinData);
-//        if( !ret2) return false;
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model Init start (%s). %s %s(%d)", value.mName.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+        /* テクスチャInit */
+        bool ret2 = value.InitTexture();
+        std::vector<char>().swap(value.mWkTexBinData);
+        if( !ret2) return false;
 //        /* シェーダ初期化 */
 //        bool ret3 = value.InitShaders();
 //        if( !ret3) return false;
-//        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Shader Init end(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Shader Init end(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     }
     return true;
 }
@@ -64,7 +64,7 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj:
 void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 //	LoadTexture(BASE_PATH + std::string(textureFileName));
-	InitTexture();
+//	InitTexture();
 	m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
 	InitBuffer();
 }
@@ -121,36 +121,15 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
 
-void Md2Model::LoadTexture(std::string textureFileName)
-{
-	auto [retbool, w, h, rgbabindata] = m_texture.LoadTexture(textureFileName, true);
-	if(retbool) {
-		mWkWidth = w;
-		mWkHeight= h;
-		mWkRgbaData.resize(w*h*4);
-		for(int lpct = 0; lpct < w*h*4; lpct++) {
-			mWkRgbaData[lpct] = rgbabindata[lpct];
-		}
-	}
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "w,h(%d,%d) %s %s(%d)", mWkWidth, mWkHeight, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	for(int lpct = 0; lpct < mWkRgbaData.size(); lpct+=16) {
-		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "[%d](%x,%x,%x,%x,%x,%x,%x,%x %x,%x,%x,%x,%x,%x,%x,%x) %s %s(%d)", lpct,
-							mWkRgbaData[lpct+ 0],mWkRgbaData[lpct+ 1],mWkRgbaData[lpct+ 2],mWkRgbaData[lpct+ 3],
-							mWkRgbaData[lpct+ 4],mWkRgbaData[lpct+ 5],mWkRgbaData[lpct+ 6],mWkRgbaData[lpct+ 7],
-							mWkRgbaData[lpct+ 8],mWkRgbaData[lpct+ 9],mWkRgbaData[lpct+10],mWkRgbaData[lpct+11],
-							mWkRgbaData[lpct+12],mWkRgbaData[lpct+13],mWkRgbaData[lpct+14],mWkRgbaData[lpct+15],
-							__PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	}
-	return;
-}
-
-void Md2Model::InitTexture() {
+bool Md2Model::InitTexture() {
 	m_texture.InitTexture(mWkWidth, mWkHeight,
 						  reinterpret_cast<unsigned char*>(mWkRgbaData.data()));
 	mWkWidth = -1;
 	mWkHeight = -1;
 //	std::vector<char>().swap(mWkRgbaData);
 	m_textureLoaded = true;
+
+	return true;
 }
 
 size_t Md2Model::GetEndFrame()

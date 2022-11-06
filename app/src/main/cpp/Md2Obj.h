@@ -54,11 +54,11 @@ public:
 
 public:
     bool LoadModel();
-    bool LoadTexture();
+    bool LoadTexture(); /* AssetsからTextureデータを読込む */
+    bool InitTexture(); /* TextureデータをOpenGLで使えるようにする */
+
 
 private:
-    void LoadTexture(std::string textureFileName);
-    void InitTexture();
     void InitBuffer();
 
 public:

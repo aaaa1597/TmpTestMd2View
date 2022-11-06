@@ -122,6 +122,11 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
     /* OpenGL初期化(GL系は、このタイミングでないとエラーになる) */
     GlObj::GlInit();
 
+    /* GL系モデル初期化(GL系は、このタイミングでないとエラーになる) */
+    bool ret = Md2Obj::InitModel(gMd2Models);
+    if(!ret)
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::InitModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+
     pRenderer->OnSurfaceCreated(gMd2Models);
 
     gMutex.unlock();
