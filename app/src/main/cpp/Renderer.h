@@ -12,7 +12,5 @@
 
 class Renderer {
 public:
-    Renderer();
-
     void OnDrawFrame(std::map<std::string, Md2Model> &md2models);
 };

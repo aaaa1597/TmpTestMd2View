@@ -6,8 +6,6 @@
 
 GlobalSpaceObj                        gGlobalSpacePrm;/* グローバル空間パラメータ */
 
-Renderer::Renderer() = default;
-
 void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)
 {
 //    std::chrono::system_clock::time_point  start, end; // 型は auto で可
