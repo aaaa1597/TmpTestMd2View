@@ -8,7 +8,7 @@
 #include "GlobalSpaceObj.h"
 
 static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
-extern GlobalSpaceObj gGlobalSpacePrm;/* グローバル空間パラメータ */
+GlobalSpaceObj gGlobalSpacePrm;/* グローバル空間パラメータ */
 
 /* Md2モデル読込み(model読込,tex読込) */
 bool Md2Obj::LoadModel(std::map<std::string, Md2Model> &md2models) {

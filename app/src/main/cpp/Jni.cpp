@@ -10,18 +10,15 @@
 #include "Md2Obj.h"
 #include "GlObj.h"
 #include "GlobalSpaceObj.h"
-#include "Renderer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-std::map<std::string, Md2Model>       gMd2Models;     /* Md2モデルデータ実体 */
-std::mutex                            gMutex;         /* onStart()完了待ちmutex */
-extern GlobalSpaceObj gGlobalSpacePrm;/* グローバル空間パラメータ */
-std::chrono::system_clock::time_point gPreStartTime;/* 前回開始時刻 */
-
-static std::unique_ptr<Renderer> pRenderer = std::make_unique<Renderer>();
+std::map<std::string, Md2Model>       gMd2Models;       /* Md2モデルデータ実体 */
+std::mutex                            gMutex;           /* onStart()完了待ちmutex */
+extern GlobalSpaceObj                        gGlobalSpacePrm;  /* グローバル空間パラメータ */
+std::chrono::system_clock::time_point gPreStartTime;    /* 前回開始時刻 */
 
 /* onStart */
 JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(JNIEnv *env, jobject thiz, jobject assets,
@@ -184,8 +181,6 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
 /* onDrawFrame */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(JNIEnv *env, jobject thiz) {
 //  __android_log_print(ANDROID_LOG_INFO, "aaaaa", "%s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    pRenderer->OnDrawFrame(gMd2Models);
-
     Md2Obj::ArgType globalprm = {gGlobalSpacePrm.mMvpMat, gGlobalSpacePrm.mNormalMatrix, gGlobalSpacePrm.mScale, gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey};
 
     /* 前回描画からの経過時間を算出 */
