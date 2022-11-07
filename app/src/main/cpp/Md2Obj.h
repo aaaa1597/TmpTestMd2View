@@ -49,7 +49,7 @@ public:
     void setFileName(const char *md2FileName, const char *textureFileName);
     ~Md2Model();
     // The frame parameter start at 0
-    void Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection);
+    void Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection, glm::mat4 &lmodel);
     size_t GetEndFrame();
     void SetPosition(float x, float y, float z);
 

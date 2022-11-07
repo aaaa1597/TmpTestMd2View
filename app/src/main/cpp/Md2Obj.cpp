@@ -5,8 +5,10 @@
 #include "TexObj.h"
 #include "GlObj.h"
 #include "ShaderProgram.h"
+#include "GlobalSpaceObj.h"
 
 static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
+extern GlobalSpaceObj gGlobalSpacePrm;/* グローバル空間パラメータ */
 
 /* Md2モデル読込み(model読込,tex読込) */
 bool Md2Obj::LoadModel(std::map<std::string, Md2Model> &md2models) {
@@ -85,7 +87,7 @@ Md2Model::~Md2Model()
 	glDeleteBuffers(1, &mVboId);
 }
 
-void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection)
+void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection, glm::mat4 &lmodel)
 {
 	glEnable(GL_DEPTH_TEST);
 	assert(m_textureLoaded);
@@ -101,6 +103,13 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
 			glm::rotate(model, glm::radians(xAngle), glm::vec3(1.0f, 0.0f, 0.0f)) *
 			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
 			glm::scale(model, glm::vec3(0.3 * scale, 0.3 * scale, 0.3 * scale));
+	lmodel = model;
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "-----------------");
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "model-mat[0](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_model[0][0], gGlobalSpacePrm.m_model[0][1], gGlobalSpacePrm.m_model[0][2], gGlobalSpacePrm.m_model[0][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "model-mat[1](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_model[1][0], gGlobalSpacePrm.m_model[1][1], gGlobalSpacePrm.m_model[1][2], gGlobalSpacePrm.m_model[1][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "model-mat[2](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_model[2][0], gGlobalSpacePrm.m_model[2][1], gGlobalSpacePrm.m_model[2][2], gGlobalSpacePrm.m_model[2][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "model-mat[3](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_model[3][0], gGlobalSpacePrm.m_model[3][1], gGlobalSpacePrm.m_model[3][2], gGlobalSpacePrm.m_model[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+
 
 	GlObj::useProgram(mProgramId);
 //	m_shaderProgram.Use();
@@ -278,14 +287,14 @@ bool Md2Model::LoadTexture() {
 		mWkRgbaData = std::move(rgbabindata);
 	}
 	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "w,h(%d,%d) %s %s(%d)", mWkWidth, mWkHeight, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	for(int lpct = 0; lpct < mWkRgbaData.size(); lpct+=16) {
-		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "[%d](%x,%x,%x,%x,%x,%x,%x,%x %x,%x,%x,%x,%x,%x,%x,%x) %s %s(%d)", lpct,
-							mWkRgbaData[lpct+ 0],mWkRgbaData[lpct+ 1],mWkRgbaData[lpct+ 2],mWkRgbaData[lpct+ 3],
-							mWkRgbaData[lpct+ 4],mWkRgbaData[lpct+ 5],mWkRgbaData[lpct+ 6],mWkRgbaData[lpct+ 7],
-							mWkRgbaData[lpct+ 8],mWkRgbaData[lpct+ 9],mWkRgbaData[lpct+10],mWkRgbaData[lpct+11],
-							mWkRgbaData[lpct+12],mWkRgbaData[lpct+13],mWkRgbaData[lpct+14],mWkRgbaData[lpct+15],
-							__PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	}
+//	for(int lpct = 0; lpct < mWkRgbaData.size(); lpct+=16) {
+//		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "[%d](%x,%x,%x,%x,%x,%x,%x,%x %x,%x,%x,%x,%x,%x,%x,%x) %s %s(%d)", lpct,
+//							mWkRgbaData[lpct+ 0],mWkRgbaData[lpct+ 1],mWkRgbaData[lpct+ 2],mWkRgbaData[lpct+ 3],
+//							mWkRgbaData[lpct+ 4],mWkRgbaData[lpct+ 5],mWkRgbaData[lpct+ 6],mWkRgbaData[lpct+ 7],
+//							mWkRgbaData[lpct+ 8],mWkRgbaData[lpct+ 9],mWkRgbaData[lpct+10],mWkRgbaData[lpct+11],
+//							mWkRgbaData[lpct+12],mWkRgbaData[lpct+13],mWkRgbaData[lpct+14],mWkRgbaData[lpct+15],
+//							__PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+//	}
 	return retbool;
 }
 
