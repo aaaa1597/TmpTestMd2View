@@ -19,12 +19,9 @@ void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)
     static const int START_FRAME = 0;
     static const int END_FRAME = m_player->GetEndFrame();
 
-    gGlobalSpacePrm.m_xAngle += gGlobalSpacePrm.mRotatex;
-    gGlobalSpacePrm.m_yAngle -= gGlobalSpacePrm.mRotatey;
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_player->Draw(gGlobalSpacePrm.m_renderFrame, gGlobalSpacePrm.m_xAngle, gGlobalSpacePrm.m_yAngle, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_interpolation, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
-    m_player2->Draw(gGlobalSpacePrm.m_renderFrame, gGlobalSpacePrm.m_xAngle, gGlobalSpacePrm.m_yAngle, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_interpolation, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
+    m_player->Draw(gGlobalSpacePrm.m_renderFrame, gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_interpolation, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
+    m_player2->Draw(gGlobalSpacePrm.m_renderFrame, gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_interpolation, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
     if (gGlobalSpacePrm.m_interpolation >= 1.0f)
     {
         gGlobalSpacePrm.m_interpolation = 0.0f;

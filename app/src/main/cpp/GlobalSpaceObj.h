@@ -41,7 +41,7 @@ public:
     std::array<float,  3> mTargetPos = {};
     std::array<float,  3> mUpPos     = {};
     float mScale  = 1.0f;
-    float mRotatex= 0;
+    float mRotatex= 180.0f;
     float mRotatey= 0;
 
 public:
@@ -53,8 +53,6 @@ public:
     glm::vec3 m_up;
     size_t m_renderFrame = 0;
     float m_interpolation = 0.0f;
-    float m_xAngle = 180.0f;
-    float m_yAngle = 0.0f;
 };
 
 #endif //CPPMD2VIEWER_GLOBALSPACEOBJ_H

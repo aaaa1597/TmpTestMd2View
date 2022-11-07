@@ -230,8 +230,8 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setScale(JNI
 
 /* モデルデータ回転設定 */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setRotate(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
-    gGlobalSpacePrm.mRotatex = x;
-    gGlobalSpacePrm.mRotatey = y;
+    gGlobalSpacePrm.mRotatex += x;
+    gGlobalSpacePrm.mRotatey -= y;
 }
 
 #ifdef __cplusplus
