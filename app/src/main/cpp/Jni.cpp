@@ -1,5 +1,3 @@
-#include <jni.h>
-#include <memory>
 #include <map>
 #include <mutex>
 #include <chrono>
@@ -130,6 +128,20 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
     gMd2Models.at("grunt").SetPosition(0.0f, 6.5f, -25.0f);
 
 
+    gGlobalSpacePrm.m_camPos = glm::vec3(0.0f, 0.0f, 0.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_camPos.x, gGlobalSpacePrm.m_camPos.y, gGlobalSpacePrm.m_camPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.m_targetPos = glm::vec3(0.0f, 0.0f, -20.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "targetPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_targetPos.x, gGlobalSpacePrm.m_targetPos.y, gGlobalSpacePrm.m_targetPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.m_up = glm::vec3(1.0f, 0.0f, 0.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "up-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_up.x, gGlobalSpacePrm.m_up.y, gGlobalSpacePrm.m_up.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    // Create the View matrix
+    gGlobalSpacePrm.m_view = glm::lookAt(gGlobalSpacePrm.m_camPos, gGlobalSpacePrm.m_camPos + gGlobalSpacePrm.m_targetPos, gGlobalSpacePrm.m_up);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[0](%f,%f,%f,%f) [1](%f,%f,%f,%f) [2](%f,%f,%f,%f) [3](%f,%f,%f,%f) %s %s(%d)"
+            , gGlobalSpacePrm.m_view[0][0], gGlobalSpacePrm.m_view[0][1], gGlobalSpacePrm.m_view[0][2], gGlobalSpacePrm.m_view[0][3]
+            , gGlobalSpacePrm.m_view[1][0], gGlobalSpacePrm.m_view[1][1], gGlobalSpacePrm.m_view[1][2], gGlobalSpacePrm.m_view[1][3]
+            , gGlobalSpacePrm.m_view[2][0], gGlobalSpacePrm.m_view[2][1], gGlobalSpacePrm.m_view[2][2], gGlobalSpacePrm.m_view[2][3]
+            , gGlobalSpacePrm.m_view[3][0], gGlobalSpacePrm.m_view[3][1], gGlobalSpacePrm.m_view[3][2], gGlobalSpacePrm.m_view[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+
     /* View行列を更新 */
     std::array<float,  3> camerapos = {0.0f, 0.0f, 0.0f};
     std::array<float,  3> targetpos = {0.0f, 0.0f, -20.0f};
@@ -150,19 +162,6 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
     std::array<float, 16> vpmat = Mat44::multMatrixf(gGlobalSpacePrm.mProjectionMat, gGlobalSpacePrm.mViewMat);
     gGlobalSpacePrm.mMvpMat     = Mat44::multMatrixf(vpmat, gGlobalSpacePrm.mModelMat);
 
-    gGlobalSpacePrm.m_camPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_camPos.x, gGlobalSpacePrm.m_camPos.y, gGlobalSpacePrm.m_camPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.m_targetPos = glm::vec3(0.0f, 0.0f, -20.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "targetPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_targetPos.x, gGlobalSpacePrm.m_targetPos.y, gGlobalSpacePrm.m_targetPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.m_up = glm::vec3(1.0f, 0.0f, 0.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "up-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_up.x, gGlobalSpacePrm.m_up.y, gGlobalSpacePrm.m_up.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    // Create the View matrix
-    gGlobalSpacePrm.m_view = glm::lookAt(gGlobalSpacePrm.m_camPos, gGlobalSpacePrm.m_camPos + gGlobalSpacePrm.m_targetPos, gGlobalSpacePrm.m_up);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[0](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[0][0], gGlobalSpacePrm.m_view[0][1], gGlobalSpacePrm.m_view[0][2], gGlobalSpacePrm.m_view[0][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[1](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[1][0], gGlobalSpacePrm.m_view[1][1], gGlobalSpacePrm.m_view[1][2], gGlobalSpacePrm.m_view[1][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[2](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[2][0], gGlobalSpacePrm.m_view[2][1], gGlobalSpacePrm.m_view[2][2], gGlobalSpacePrm.m_view[2][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[3](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[3][0], gGlobalSpacePrm.m_view[3][1], gGlobalSpacePrm.m_view[3][2], gGlobalSpacePrm.m_view[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-
     gMutex.unlock();
     return;
 }
@@ -176,6 +175,24 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
 
     float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
     gGlobalSpacePrm.m_projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "m_projection[0](%f,%f,%f,%f) [1](%f,%f,%f,%f) [2](%f,%f,%f,%f) [3](%f,%f,%f,%f) %s %s(%d)"
+            , gGlobalSpacePrm.m_projection[0][0], gGlobalSpacePrm.m_projection[0][1], gGlobalSpacePrm.m_projection[0][2], gGlobalSpacePrm.m_projection[0][3]
+            , gGlobalSpacePrm.m_projection[1][0], gGlobalSpacePrm.m_projection[1][1], gGlobalSpacePrm.m_projection[1][2], gGlobalSpacePrm.m_projection[1][3]
+            , gGlobalSpacePrm.m_projection[2][0], gGlobalSpacePrm.m_projection[2][1], gGlobalSpacePrm.m_projection[2][2], gGlobalSpacePrm.m_projection[2][3]
+            , gGlobalSpacePrm.m_projection[3][0], gGlobalSpacePrm.m_projection[3][1], gGlobalSpacePrm.m_projection[3][2], gGlobalSpacePrm.m_projection[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+
+    gGlobalSpacePrm.mProjectionMat  = Mat44::getPerspectivef(30.0f, ((float)width)/((float)height), 1.0, 5000.0);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "m_projection2[0](%f,%f,%f,%f) [1](%f,%f,%f,%f) [2](%f,%f,%f,%f) [3](%f,%f,%f,%f) %s %s(%d)"
+            , gGlobalSpacePrm.mProjectionMat[0*4+0], gGlobalSpacePrm.mProjectionMat[0*4+1], gGlobalSpacePrm.mProjectionMat[0*4+2], gGlobalSpacePrm.mProjectionMat[0*4+3]
+            , gGlobalSpacePrm.mProjectionMat[1*4+0], gGlobalSpacePrm.mProjectionMat[1*4+1], gGlobalSpacePrm.mProjectionMat[1*4+2], gGlobalSpacePrm.mProjectionMat[1*4+3]
+            , gGlobalSpacePrm.mProjectionMat[2*4+0], gGlobalSpacePrm.mProjectionMat[2*4+1], gGlobalSpacePrm.mProjectionMat[2*4+2], gGlobalSpacePrm.mProjectionMat[2*4+3]
+            , gGlobalSpacePrm.mProjectionMat[3*4+0], gGlobalSpacePrm.mProjectionMat[3*4+1], gGlobalSpacePrm.mProjectionMat[3*4+2], gGlobalSpacePrm.mProjectionMat[3*4+3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+
+    /* 投影行列を更新したので再計算 */
+    std::array<float, 16> vpmat     = Mat44::multMatrixf(gGlobalSpacePrm.mProjectionMat, gGlobalSpacePrm.mViewMat);
+    gGlobalSpacePrm.mMvpMat         = Mat44::multMatrixf(vpmat, gGlobalSpacePrm.mModelMat);
+
+    return;
 }
 
 /* onDrawFrame */
