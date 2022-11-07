@@ -40,7 +40,7 @@ public:
     std::array<float,  3> mCameraPos = {};
     std::array<float,  3> mTargetPos = {};
     std::array<float,  3> mUpPos     = {};
-    float mScale  = 0;
+    float mScale  = 1.0f;
     float mRotatex= 0;
     float mRotatey= 0;
 
@@ -57,7 +57,6 @@ public:
     float m_rotationY = 0.0f;
     float m_xAngle = 180.0f;
     float m_yAngle = 0.0f;
-    float m_scale = 1.0f;
 };
 
 #endif //CPPMD2VIEWER_GLOBALSPACEOBJ_H
