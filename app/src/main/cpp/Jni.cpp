@@ -177,7 +177,8 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
     /* setViewport() */
     GlObj::setViewport(0, 0, width, height);
 
-    pRenderer->OnSurfaceChanged(width, height);
+    float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+    gGlobalSpacePrm.m_projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
 }
 
 /* onDrawFrame */

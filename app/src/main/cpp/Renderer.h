@@ -14,7 +14,5 @@ class Renderer {
 public:
     Renderer();
 
-    void OnSurfaceChanged(int width, int height);
-
     void OnDrawFrame(std::map<std::string, Md2Model> &md2models);
 };

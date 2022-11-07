@@ -8,14 +8,6 @@ GlobalSpaceObj                        gGlobalSpacePrm;/* グローバル空間�
 
 Renderer::Renderer() = default;
 
-void Renderer::OnSurfaceChanged(int width, int height) {
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "(w,h)=(%d,%d) %s %s(%d)", width, height, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-
-    // Create the projection matrix
-    float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-    gGlobalSpacePrm.m_projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-}
-
 void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)
 {
 //    std::chrono::system_clock::time_point  start, end; // 型は auto で可
