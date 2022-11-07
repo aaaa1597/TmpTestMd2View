@@ -14,20 +14,6 @@ void Renderer::OnSurfaceChanged(int width, int height) {
     // Create the projection matrix
     float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
     gGlobalSpacePrm.m_projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-
-    gGlobalSpacePrm.m_camPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_camPos.x, gGlobalSpacePrm.m_camPos.y, gGlobalSpacePrm.m_camPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.m_targetPos = glm::vec3(0.0f, 0.0f, -20.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "targetPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_targetPos.x, gGlobalSpacePrm.m_targetPos.y, gGlobalSpacePrm.m_targetPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.m_up = glm::vec3(1.0f, 0.0f, 0.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "up-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_up.x, gGlobalSpacePrm.m_up.y, gGlobalSpacePrm.m_up.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-
-    // Create the View matrix
-    gGlobalSpacePrm.m_view = glm::lookAt(gGlobalSpacePrm.m_camPos, gGlobalSpacePrm.m_camPos + gGlobalSpacePrm.m_targetPos, gGlobalSpacePrm.m_up);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[0](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[0][0], gGlobalSpacePrm.m_view[0][1], gGlobalSpacePrm.m_view[0][2], gGlobalSpacePrm.m_view[0][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[1](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[1][0], gGlobalSpacePrm.m_view[1][1], gGlobalSpacePrm.m_view[1][2], gGlobalSpacePrm.m_view[1][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[2](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[2][0], gGlobalSpacePrm.m_view[2][1], gGlobalSpacePrm.m_view[2][2], gGlobalSpacePrm.m_view[2][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[3](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[3][0], gGlobalSpacePrm.m_view[3][1], gGlobalSpacePrm.m_view[3][2], gGlobalSpacePrm.m_view[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 }
 
 void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)

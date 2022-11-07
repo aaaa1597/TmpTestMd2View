@@ -133,13 +133,17 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
     gMd2Models.at("grunt").SetPosition(0.0f, 6.5f, -25.0f);
 
 
-    gGlobalSpacePrm.mCameraPos = {0.0f, 0.0f, 0.0f};
+    /* View行列を更新 */
+    std::array<float,  3> camerapos = {0.0f, 0.0f, 0.0f};
+    std::array<float,  3> targetpos = {0.0f, 0.0f, -20.0f};
+    std::array<float,  3> uppos     = {1.0f, 0.0f, 0.0f};
+    gGlobalSpacePrm.mCameraPos = camerapos;
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mCameraPos[0], gGlobalSpacePrm.mCameraPos[1], gGlobalSpacePrm.mCameraPos[2], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.mTargetPos = {0.0f, 0.0f, -20.0f};
+    gGlobalSpacePrm.mTargetPos = targetpos;
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Target-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mTargetPos[0], gGlobalSpacePrm.mTargetPos[1], gGlobalSpacePrm.mTargetPos[2], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.mUpPos     = {1.0f, 0.0f, 0.0f};
+    gGlobalSpacePrm.mUpPos     = uppos;
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "UpPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mUpPos[0], gGlobalSpacePrm.mUpPos[1], gGlobalSpacePrm.mUpPos[2], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.mViewMat   = Mat44::getLookAtf(gGlobalSpacePrm.mCameraPos, gGlobalSpacePrm.mTargetPos, gGlobalSpacePrm.mUpPos);
+    gGlobalSpacePrm.mViewMat   = Mat44::getLookAtf(camerapos, targetpos, uppos);
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "View-Mat[0](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mViewMat[ 0], gGlobalSpacePrm.mViewMat[ 1], gGlobalSpacePrm.mViewMat[ 2], gGlobalSpacePrm.mViewMat[ 3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "View-Mat[1](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mViewMat[ 4], gGlobalSpacePrm.mViewMat[ 5], gGlobalSpacePrm.mViewMat[ 6], gGlobalSpacePrm.mViewMat[ 7], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "View-Mat[2](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mViewMat[ 8], gGlobalSpacePrm.mViewMat[ 9], gGlobalSpacePrm.mViewMat[10], gGlobalSpacePrm.mViewMat[11], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
@@ -148,6 +152,19 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
     /* ビュー行列を更新したので再計算 */
     std::array<float, 16> vpmat = Mat44::multMatrixf(gGlobalSpacePrm.mProjectionMat, gGlobalSpacePrm.mViewMat);
     gGlobalSpacePrm.mMvpMat     = Mat44::multMatrixf(vpmat, gGlobalSpacePrm.mModelMat);
+
+    gGlobalSpacePrm.m_camPos = glm::vec3(0.0f, 0.0f, 0.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_camPos.x, gGlobalSpacePrm.m_camPos.y, gGlobalSpacePrm.m_camPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.m_targetPos = glm::vec3(0.0f, 0.0f, -20.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "targetPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_targetPos.x, gGlobalSpacePrm.m_targetPos.y, gGlobalSpacePrm.m_targetPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.m_up = glm::vec3(1.0f, 0.0f, 0.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "up-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_up.x, gGlobalSpacePrm.m_up.y, gGlobalSpacePrm.m_up.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    // Create the View matrix
+    gGlobalSpacePrm.m_view = glm::lookAt(gGlobalSpacePrm.m_camPos, gGlobalSpacePrm.m_camPos + gGlobalSpacePrm.m_targetPos, gGlobalSpacePrm.m_up);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[0](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[0][0], gGlobalSpacePrm.m_view[0][1], gGlobalSpacePrm.m_view[0][2], gGlobalSpacePrm.m_view[0][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[1](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[1][0], gGlobalSpacePrm.m_view[1][1], gGlobalSpacePrm.m_view[1][2], gGlobalSpacePrm.m_view[1][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[2](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[2][0], gGlobalSpacePrm.m_view[2][1], gGlobalSpacePrm.m_view[2][2], gGlobalSpacePrm.m_view[2][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[3](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_view[3][0], gGlobalSpacePrm.m_view[3][1], gGlobalSpacePrm.m_view[3][2], gGlobalSpacePrm.m_view[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
     gMutex.unlock();
     return;
