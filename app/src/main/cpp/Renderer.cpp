@@ -27,8 +27,8 @@ void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)
     static const int START_FRAME = 0;
     static const int END_FRAME = m_player->GetEndFrame();
 
-    gGlobalSpacePrm.m_xAngle += gGlobalSpacePrm.m_rotationX;
-    gGlobalSpacePrm.m_yAngle -= gGlobalSpacePrm.m_rotationY;
+    gGlobalSpacePrm.m_xAngle += gGlobalSpacePrm.mRotatex;
+    gGlobalSpacePrm.m_yAngle -= gGlobalSpacePrm.mRotatey;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_player->Draw(gGlobalSpacePrm.m_renderFrame, gGlobalSpacePrm.m_xAngle, gGlobalSpacePrm.m_yAngle, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_interpolation, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
@@ -50,10 +50,4 @@ void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)
 //    end = std::chrono::system_clock::now();
 //    double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count(); //処理に要した時間をミリ秒に変換
 //    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "fps=%f elapsed=%f[ms] m_xAngle=%f m_yAngle=%f. %s %s(%d)", 1000.0f/elapsed, elapsed, m_xAngle, m_yAngle, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-}
-
-void Renderer::SetRotationAngles(float x, float y)
-{
-    gGlobalSpacePrm.m_rotationX = x;
-    gGlobalSpacePrm.m_rotationY = y;
 }

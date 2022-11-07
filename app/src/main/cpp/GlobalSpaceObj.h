@@ -53,8 +53,6 @@ public:
     glm::vec3 m_up;
     size_t m_renderFrame = 0;
     float m_interpolation = 0.0f;
-    float m_rotationX = 0.0f;
-    float m_rotationY = 0.0f;
     float m_xAngle = 180.0f;
     float m_yAngle = 0.0f;
 };
