@@ -82,6 +82,13 @@ void Md2Obj::setScale(std::map<std::string, Md2Model> &md2models, float scale) {
 
 void Md2Model::SetPosition(float x, float y, float z) {
 	mPosition = glm::vec3(x, y, z);
+
+	glm::mat4 model;
+	m_model = glm::translate(model, mPosition) *
+			  glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			  glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+			  glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			  glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
 }
 
 Md2Model::~Md2Model()
@@ -98,13 +105,12 @@ void Md2Model::Draw(const glm::mat4 &view, const glm::mat4 &projection)
 	GlObj::activeTexture(GL_TEXTURE0);
 	GlObj::bindTexture(GL_TEXTURE_2D, mTexId);
 
-	glm::mat4 model;
-
-    m_model = glm::translate(model, mPosition) *
-			glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
-			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
+//	glm::mat4 model;
+//    m_model = glm::translate(model, mPosition) *
+//			glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+//			glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+//			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+//			glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
 
 	GlObj::useProgram(mProgramId);
 //	m_shaderProgram.Use();
@@ -274,6 +280,13 @@ bool Md2Model::LoadModel() {
 	/* MD2バイナリデータ解放 */
 	std::vector<char>().swap(mWkMd2BinData);
 
+	glm::mat4 model;
+    m_model = glm::translate(model, mPosition) *
+			glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
+
 	return true;
 }
 
@@ -343,9 +356,21 @@ bool Md2Model::InitShaders() {
 void Md2Model::setRotate(float x, float y) {
 	mRotatex += x;
 	mRotatey -= y;
+	glm::mat4 model;
+	m_model = glm::translate(model, mPosition) *
+			  glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			  glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+			  glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			  glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
 }
 
 void Md2Model::setScale(float scale) {
 	mScale = scale;
+	glm::mat4 model;
+	m_model = glm::translate(model, mPosition) *
+			  glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			  glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+			  glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			  glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
 }
 
