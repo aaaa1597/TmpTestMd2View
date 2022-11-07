@@ -92,6 +92,7 @@ public:
     float mScale  = 1.0f;
     float mRotatex= 180.0f;
     float mRotatey= 0;
+    glm::mat4 m_model;
 };
 
 class Md2Obj {

@@ -100,7 +100,7 @@ void Md2Model::Draw(const glm::mat4 &view, const glm::mat4 &projection)
 
 	glm::mat4 model;
 
-	model = glm::translate(model, mPosition) *
+    m_model = glm::translate(model, mPosition) *
 			glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
 			glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
 			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
@@ -119,7 +119,7 @@ void Md2Model::Draw(const glm::mat4 &view, const glm::mat4 &projection)
 	/* ↑これOK ここまで */
 	/* ↓これもOK ここから */
     const glm::mat4 &vpmat = projection * view;
-    m_shaderProgram.SetUniform(mProgramId, "mvpmat", vpmat * model);
+    m_shaderProgram.SetUniform(mProgramId, "mvpmat", vpmat * m_model);
 	/* ↑これもOK ここまで */
 
 	auto count = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
