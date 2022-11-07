@@ -5,10 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <memory>
 #include <tuple>
-#include <cstdio>
-#include <cstdlib>
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include "Md2Parts.h"
@@ -45,12 +42,9 @@ using RetShaderAttribs2 = std::tuple<bool, std::unordered_map<int, std::pair<int
 
 class Md2Model {
 public:
-//    Md2Model(const char *md2FileName, const char *textureFileName);
-    void setFileName(const char *md2FileName, const char *textureFileName);
     ~Md2Model();
     // The frame parameter start at 0
-    void Draw(float xAngle, float yAngle, float scale, const glm::mat4 &view, const glm::mat4 &projection, glm::mat4 &lmodel);
-    size_t GetEndFrame();
+    void Draw(const glm::mat4 &view, const glm::mat4 &projection);
     void SetPosition(float x, float y, float z);
 
 public:
@@ -64,6 +58,10 @@ private:
 
 public:
     ShaderProgram       m_shaderProgram = {};
+
+public:
+    void setRotate(float x, float y);
+    void setScale(float scale);
 
 public:
     std::string         mName = {0};
@@ -90,14 +88,20 @@ public:
     GLuint mCurPosAttrib  = -1;
     GLuint mNextPosAttrib = -1;
     GLuint mTexCoordAttrib= -1;
+    /* 姿勢制御 */
+    float mScale  = 1.0f;
+    float mRotatex= 180.0f;
+    float mRotatey= 0;
 };
 
 class Md2Obj {
 public:
     static bool LoadModel(std::map<std::string, Md2Model> &md2models);
     static bool InitModel(std::map<std::string, Md2Model> &md2models);
-    using ArgType = std::tuple<const std::array<float, 16> &, const std::array<float, 16> &, float, float, float>;
+    using ArgType = std::tuple<const std::array<float, 16> &, const std::array<float, 16> &>;
     static bool DrawModel(std::map<std::string, Md2Model> &md2models, const ArgType &globalSpacePrm, float elapsedtimeMs);
+    static void setScale(std::map<std::string, Md2Model> &md2models, float scale);
+    static void setRotate(std::map<std::string, Md2Model> &md2models, float x, float y);
 };
 
 #endif //CPPMD2VIEWER_MD2OBJ_H

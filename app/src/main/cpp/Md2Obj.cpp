@@ -7,7 +7,6 @@
 #include "ShaderProgram.h"
 #include "GlobalSpaceObj.h"
 
-static const std::string BASE_PATH = "/data/user/0/com.tks.cppmd2viewer/files/";
 GlobalSpaceObj gGlobalSpacePrm;/* グローバル空間パラメータ */
 
 /* Md2モデル読込み(model読込,tex読込) */
@@ -50,17 +49,14 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
 bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj::ArgType &globalSpacePrm, float elapsedtimeMs) {
     const std::array<float, 16> &aMvpMat     = std::get<0>(globalSpacePrm);
     const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
-    float Scale                              = std::get<2>(globalSpacePrm);
-    float Rotatex                            = std::get<3>(globalSpacePrm);
-    float Rotatey                            = std::get<4>(globalSpacePrm);
 
 
 	Md2Model *m_player = &md2models.at("female");
 	Md2Model *m_player2= &md2models.at("grunt");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	m_player->Draw(gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
-	m_player2->Draw(gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
+	m_player->Draw(gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection);
+	m_player2->Draw(gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection);
 
 /* glEnable(GL_DEPTH_TEST); */
 //    GlObj::enable(GL_DEPTH_TEST);
@@ -71,19 +67,17 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj:
     return true;
 }
 
-void Md2Model::setFileName(const char *md2FileName, const char *textureFileName) {
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "name(%s) %s %s(%d)", md2FileName, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-//	LoadTexture(BASE_PATH + std::string(textureFileName));
-//	InitTexture();
-//	auto [boolret, progid] = m_shaderProgram.LoadShaders(BASE_PATH  + "basic.vert", BASE_PATH + "basic.frag");
-//	mProgramId = progid;
-//	auto[retbool, frameindexes, vboid, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = InitBuffer(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
-	auto[retbool, frameindexes, vboid, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib] = GlObj::setAttribute(mProgramId, mMdlData.numTotalFrames, mMdlData.vertexList, mMdlData.polyIndex, mMdlData.st);
- 	mFrameIndices  = std::move(frameindexes);
-	mVboId         = vboid;
-	mCurPosAttrib  = retCurPosAttrib;
-	mNextPosAttrib = retNextPosAttrib;
-	mTexCoordAttrib= retTexCoordAttrib;
+void Md2Obj::setRotate(std::map<std::string, Md2Model> &md2models, float x, float y) {
+	for(auto &[key, value] : md2models) {
+		value.setRotate(x, y);
+	}
+	return;
+}
+
+void Md2Obj::setScale(std::map<std::string, Md2Model> &md2models, float scale) {
+	for(auto &[key, value] : md2models) {
+		value.setScale(scale);
+	}
 }
 
 void Md2Model::SetPosition(float x, float y, float z) {
@@ -95,7 +89,7 @@ Md2Model::~Md2Model()
 	glDeleteBuffers(1, &mVboId);
 }
 
-void Md2Model::Draw(float xAngle, float yAngle, float scale, const glm::mat4 &view, const glm::mat4 &projection, glm::mat4 &lmodel)
+void Md2Model::Draw(const glm::mat4 &view, const glm::mat4 &projection)
 {
 	glEnable(GL_DEPTH_TEST);
 	assert(m_textureLoaded);
@@ -107,17 +101,10 @@ void Md2Model::Draw(float xAngle, float yAngle, float scale, const glm::mat4 &vi
 	glm::mat4 model;
 
 	model = glm::translate(model, mPosition) *
-			glm::rotate(model, glm::radians(yAngle), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			glm::rotate(model, glm::radians(xAngle), glm::vec3(1.0f, 0.0f, 0.0f)) *
+			glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+			glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
 			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			glm::scale(model, glm::vec3(0.3 * scale, 0.3 * scale, 0.3 * scale));
-	lmodel = model;
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "-----------------");
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "model-mat[0](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_model[0][0], gGlobalSpacePrm.m_model[0][1], gGlobalSpacePrm.m_model[0][2], gGlobalSpacePrm.m_model[0][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "model-mat[1](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_model[1][0], gGlobalSpacePrm.m_model[1][1], gGlobalSpacePrm.m_model[1][2], gGlobalSpacePrm.m_model[1][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "model-mat[2](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_model[2][0], gGlobalSpacePrm.m_model[2][1], gGlobalSpacePrm.m_model[2][2], gGlobalSpacePrm.m_model[2][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "model-mat[3](%f,%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_model[3][0], gGlobalSpacePrm.m_model[3][1], gGlobalSpacePrm.m_model[3][2], gGlobalSpacePrm.m_model[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-
+			glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
 
 	GlObj::useProgram(mProgramId);
 //	m_shaderProgram.Use();
@@ -153,11 +140,6 @@ void Md2Model::Draw(float xAngle, float yAngle, float scale, const glm::mat4 &vi
 			mCurrentFrame++;
 	}
 	minterpolate += 0.1f;
-}
-
-size_t Md2Model::GetEndFrame()
-{
-	return mMdlData.numTotalFrames - 1;
 }
 
 RetShaderAttribs2 Md2Model::InitBuffer(GLuint programId, int totalframes,
@@ -356,5 +338,14 @@ bool Md2Model::InitShaders() {
     mTexCoordAttrib= retTexCoordAttrib;
 
     return true;
+}
+
+void Md2Model::setRotate(float x, float y) {
+	mRotatex += x;
+	mRotatey -= y;
+}
+
+void Md2Model::setScale(float scale) {
+	mScale = scale;
 }
 

@@ -198,7 +198,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
 /* onDrawFrame */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(JNIEnv *env, jobject thiz) {
 //  __android_log_print(ANDROID_LOG_INFO, "aaaaa", "%s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    Md2Obj::ArgType globalprm = {gGlobalSpacePrm.mMvpMat, gGlobalSpacePrm.mNormalMatrix, gGlobalSpacePrm.mScale, gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey};
+    Md2Obj::ArgType globalprm = {gGlobalSpacePrm.mMvpMat, gGlobalSpacePrm.mNormalMatrix};
 
     /* 前回描画からの経過時間を算出 */
     std::chrono::system_clock::time_point stime = std::chrono::system_clock::now();
@@ -252,15 +252,14 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setModelPosi
 
 /* モデルデータ拡縮設定 */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setScale(JNIEnv *env, jobject thiz, jfloat scale) {
-    gGlobalSpacePrm.mScale = scale;
-
+    Md2Obj::setScale(gMd2Models, scale);
     return;
 }
 
 /* モデルデータ回転設定 */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setRotate(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
-    gGlobalSpacePrm.mRotatex += x;
-    gGlobalSpacePrm.mRotatey -= y;
+    Md2Obj::setRotate(gMd2Models, x, y);
+    return;
 }
 
 #ifdef __cplusplus

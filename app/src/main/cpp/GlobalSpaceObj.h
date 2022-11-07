@@ -40,14 +40,10 @@ public:
     std::array<float,  3> mCameraPos = {};
     std::array<float,  3> mTargetPos = {};
     std::array<float,  3> mUpPos     = {};
-    float mScale  = 1.0f;
-    float mRotatex= 180.0f;
-    float mRotatey= 0;
 
 public:
     glm::mat4 m_projection;
     glm::mat4 m_view;
-    glm::mat4 m_model;
     glm::vec3 m_camPos;
     glm::vec3 m_targetPos;
     glm::vec3 m_up;
