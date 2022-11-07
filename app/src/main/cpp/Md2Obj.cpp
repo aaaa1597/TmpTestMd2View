@@ -87,7 +87,7 @@ Md2Model::~Md2Model()
 	glDeleteBuffers(1, &mVboId);
 }
 
-void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection, glm::mat4 &lmodel)
+void Md2Model::Draw(float xAngle, float yAngle, float scale, const glm::mat4 &view, const glm::mat4 &projection, glm::mat4 &lmodel)
 {
 	glEnable(GL_DEPTH_TEST);
 	assert(m_textureLoaded);
@@ -127,15 +127,24 @@ void Md2Model::Draw(size_t frame, float xAngle, float yAngle, float scale, float
     m_shaderProgram.SetUniform(mProgramId, "mvpmat", vpmat * model);
 	/* ↑これもOK ここまで */
 
-	auto count = mFrameIndices[frame].second - mFrameIndices[frame].first + 1;
-	m_shaderProgram.SetUniform(mProgramId,"interpolation", interpolation);
+	auto count = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
+	m_shaderProgram.SetUniform(mProgramId,"interpolation", minterpolate);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVboId);
 	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
 	glVertexAttribPointer(mNextPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
 	glVertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-	glDrawArrays(GL_TRIANGLES, mFrameIndices[frame].first, count);
+	glDrawArrays(GL_TRIANGLES, mFrameIndices[mCurrentFrame].first, count);
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+
+	if(minterpolate >= 1.0f) {
+		minterpolate = 0.0f;
+		if(mCurrentFrame >= (mFrameIndices.size()-1))
+			mCurrentFrame = 0;
+		else
+			mCurrentFrame++;
+	}
+	minterpolate += 0.1f;
 }
 
 size_t Md2Model::GetEndFrame()

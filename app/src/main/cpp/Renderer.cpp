@@ -14,25 +14,9 @@ void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)
     Md2Model *m_player = &md2models.at("female");
     Md2Model *m_player2= &md2models.at("grunt");
 
-    static const int START_FRAME = 0;
-    static const int END_FRAME = m_player->GetEndFrame();
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_player->Draw(gGlobalSpacePrm.m_renderFrame, gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_interpolation, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
-    m_player2->Draw(gGlobalSpacePrm.m_renderFrame, gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_interpolation, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
-    if (gGlobalSpacePrm.m_interpolation >= 1.0f)
-    {
-        gGlobalSpacePrm.m_interpolation = 0.0f;
-        if (gGlobalSpacePrm.m_renderFrame == END_FRAME)
-        {
-            gGlobalSpacePrm.m_renderFrame = START_FRAME;
-        }
-        else
-        {
-            gGlobalSpacePrm.m_renderFrame++;
-        }
-    }
-    gGlobalSpacePrm.m_interpolation += 0.1f;
+    m_player->Draw(gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
+    m_player2->Draw(gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
 
 //    end = std::chrono::system_clock::now();
 //    double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count(); //処理に要した時間をミリ秒に変換

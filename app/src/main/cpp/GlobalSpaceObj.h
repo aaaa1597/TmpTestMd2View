@@ -51,8 +51,6 @@ public:
     glm::vec3 m_camPos;
     glm::vec3 m_targetPos;
     glm::vec3 m_up;
-    size_t m_renderFrame = 0;
-    float m_interpolation = 0.0f;
 };
 
 #endif //CPPMD2VIEWER_GLOBALSPACEOBJ_H

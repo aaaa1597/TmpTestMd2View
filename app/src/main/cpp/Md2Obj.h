@@ -49,7 +49,7 @@ public:
     void setFileName(const char *md2FileName, const char *textureFileName);
     ~Md2Model();
     // The frame parameter start at 0
-    void Draw(size_t frame, float xAngle, float yAngle, float scale, float interpolation, const glm::mat4 &view, const glm::mat4 &projection, glm::mat4 &lmodel);
+    void Draw(float xAngle, float yAngle, float scale, const glm::mat4 &view, const glm::mat4 &projection, glm::mat4 &lmodel);
     size_t GetEndFrame();
     void SetPosition(float x, float y, float z);
 
@@ -79,6 +79,8 @@ public:
     glm::vec3               mPosition = glm::vec3(0.0f, 0.0f, -25.0f);
     /* アニメ関連 */
     std::unordered_map<int, std::pair<int, int>> mFrameIndices = {};
+    int   mCurrentFrame = 0;
+    float minterpolate = 0.0f;
     /* テクスチャ関連 */
     GLuint mTexId = -1;
     bool m_textureLoaded = false;
