@@ -55,8 +55,8 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj:
 	Md2Model *m_player2= &md2models.at("grunt");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	m_player->Draw(gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection);
-	m_player2->Draw(gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection);
+	m_player->Draw(gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection);
+	m_player2->Draw(gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection);
 
 /* glEnable(GL_DEPTH_TEST); */
 //    GlObj::enable(GL_DEPTH_TEST);
@@ -96,7 +96,7 @@ Md2Model::~Md2Model()
 	glDeleteBuffers(1, &mVboId);
 }
 
-void Md2Model::Draw(const glm::mat4 &view, const glm::mat4 &projection)
+void Md2Model::Draw(const glm::mat4 &vpmat, const glm::mat4 &normalmat)
 {
 	glEnable(GL_DEPTH_TEST);
 	assert(m_textureLoaded);
@@ -124,7 +124,7 @@ void Md2Model::Draw(const glm::mat4 &view, const glm::mat4 &projection)
 //    m_shaderProgram->SetUniform("mvpmat", projection * vmmat);
 	/* ↑これOK ここまで */
 	/* ↓これもOK ここから */
-    const glm::mat4 &vpmat = projection * view;
+//    const glm::mat4 &vpmat = projection * view;
     m_shaderProgram.SetUniform(mProgramId, "mvpmat", vpmat * m_model);
 	/* ↑これもOK ここまで */
 
