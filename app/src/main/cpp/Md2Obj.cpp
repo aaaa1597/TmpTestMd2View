@@ -55,8 +55,8 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj:
 	Md2Model *m_player2= &md2models.at("grunt");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	m_player->Draw(gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection);
-	m_player2->Draw(gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection);
+	m_player->Draw(gGlobalSpacePrm.m_vpmat, gGlobalSpacePrm.m_projection);
+	m_player2->Draw(gGlobalSpacePrm.m_vpmat, gGlobalSpacePrm.m_projection);
 
 /* glEnable(GL_DEPTH_TEST); */
 //    GlObj::enable(GL_DEPTH_TEST);
@@ -146,73 +146,6 @@ void Md2Model::Draw(const glm::mat4 &vpmat, const glm::mat4 &normalmat)
 			mCurrentFrame++;
 	}
 	minterpolate += 0.1f;
-}
-
-RetShaderAttribs2 Md2Model::InitBuffer(GLuint programId, int totalframes,
-									   const std::vector<vertex> &vertexs, const std::vector<mesh> &polyIndexs,const std::vector<texstcoord> &sts) {
-	/* 返却値 */
-	std::unordered_map<int, std::pair<int, int>> retAnimFrameS2e;
-	GLuint retVboId = -1;
-	GLuint retCurPosAttrib  = glGetAttribLocation(programId, "pos");
-	GLuint retNextPosAttrib = glGetAttribLocation(programId, "nextPos");
-	GLuint retTexCoordAttrib= glGetAttribLocation(programId, "texCoord");
-
-	/* 初期知設定 */
-	std::vector<float> wkMd2Vertices = {};
-	const size_t numPolys           = polyIndexs.size();
-	const size_t numVertexsperframe = vertexs.size() / totalframes;
-
-	mMdlData.interpol = 0.0f;
-
-	// fill buffer
-	for(int frameidx = 0; frameidx < totalframes; frameidx++) {
-		const vertex *currentFrame= &vertexs[numVertexsperframe * frameidx];
-		const vertex *nextFrame   = (frameidx+1 >= totalframes) ? &vertexs[0] : &vertexs[numVertexsperframe * (frameidx+1)];
-
-		for (size_t plyidx = 0; plyidx < numPolys; plyidx++) {
-			for (size_t meshidx = 0; meshidx < 3; meshidx++) {
-				/* now frame */
-				for (size_t vidx = 0; vidx < 3; vidx++) {
-					wkMd2Vertices.emplace_back(currentFrame[polyIndexs[plyidx].meshIndex[meshidx]].v[vidx]);
-				}
-
-				/* next frame */
-				for (size_t vidx = 0; vidx < 3; vidx++) {
-					wkMd2Vertices.emplace_back(nextFrame[polyIndexs[plyidx].meshIndex[meshidx]].v[vidx]);
-				}
-
-				/* tex coords */
-				wkMd2Vertices.emplace_back(mMdlData.st[polyIndexs[plyidx].stIndex[meshidx]].s);
-				wkMd2Vertices.emplace_back(mMdlData.st[polyIndexs[plyidx].stIndex[meshidx]].t);
-			}
-		}
-
-		int startverindex= (frameidx==0) ? 0 : retAnimFrameS2e[frameidx-1].second + 1;
-		int endverindex  = ((frameidx+1) * numPolys * 3) - 1;
-		retAnimFrameS2e[frameidx] = {startverindex, endverindex};
-	}
-
-	size_t numVertexs = numPolys * 3;
-	glGenBuffers(1, &retVboId); // Generate an empty vertex buffer on the GPU
-
-	glBindBuffer(GL_ARRAY_BUFFER, retVboId);																											   // "bind" or set as the current buffer we are working with
-	glBufferData(GL_ARRAY_BUFFER, numVertexs * sizeof(float) * 8 * totalframes, &wkMd2Vertices[0], GL_STATIC_DRAW); // copy the data from CPU to GPU
-
-	// Current Frame Position attribute
-	glVertexAttribPointer(retCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
-	glEnableVertexAttribArray(retCurPosAttrib);
-
-	// Next  Frame Position attribute
-	glVertexAttribPointer(retNextPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(retNextPosAttrib);
-
-	// Texture Coord attribute
-	glVertexAttribPointer(retTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(retTexCoordAttrib);
-
-	glBindBuffer(GL_ARRAY_BUFFER, NULL);
-
-	return {true, retAnimFrameS2e, retVboId, retCurPosAttrib, retNextPosAttrib, retTexCoordAttrib};
 }
 
 bool Md2Model::LoadModel() {

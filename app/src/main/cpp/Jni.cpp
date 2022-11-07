@@ -141,6 +141,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
             , gGlobalSpacePrm.m_view[1][0], gGlobalSpacePrm.m_view[1][1], gGlobalSpacePrm.m_view[1][2], gGlobalSpacePrm.m_view[1][3]
             , gGlobalSpacePrm.m_view[2][0], gGlobalSpacePrm.m_view[2][1], gGlobalSpacePrm.m_view[2][2], gGlobalSpacePrm.m_view[2][3]
             , gGlobalSpacePrm.m_view[3][0], gGlobalSpacePrm.m_view[3][1], gGlobalSpacePrm.m_view[3][2], gGlobalSpacePrm.m_view[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.m_vpmat = gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view;
 
     /* View行列を更新 */
     std::array<float,  3> camerapos = {0.0f, 0.0f, 0.0f};
@@ -180,6 +181,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
             , gGlobalSpacePrm.m_projection[1][0], gGlobalSpacePrm.m_projection[1][1], gGlobalSpacePrm.m_projection[1][2], gGlobalSpacePrm.m_projection[1][3]
             , gGlobalSpacePrm.m_projection[2][0], gGlobalSpacePrm.m_projection[2][1], gGlobalSpacePrm.m_projection[2][2], gGlobalSpacePrm.m_projection[2][3]
             , gGlobalSpacePrm.m_projection[3][0], gGlobalSpacePrm.m_projection[3][1], gGlobalSpacePrm.m_projection[3][2], gGlobalSpacePrm.m_projection[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.m_vpmat = gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view;
 
     gGlobalSpacePrm.mProjectionMat  = Mat44::getPerspectivef(30.0f, ((float)width)/((float)height), 1.0, 5000.0);
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "m_projection2[0](%f,%f,%f,%f) [1](%f,%f,%f,%f) [2](%f,%f,%f,%f) [3](%f,%f,%f,%f) %s %s(%d)"

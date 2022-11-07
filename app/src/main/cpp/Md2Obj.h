@@ -53,9 +53,6 @@ public:
     bool InitTexture(); /* TextureデータをOpenGLで使えるようにする */
     bool InitShaders(); /* シェーダをOpenGLで使えるようにする */
 
-private:
-    RetShaderAttribs2 InitBuffer(GLuint programId, int totalframes, const std::vector<vertex> &vertexs, const std::vector<mesh> &polyIndexs,const std::vector<texstcoord> &sts);
-
 public:
     ShaderProgram       m_shaderProgram = {};
 
