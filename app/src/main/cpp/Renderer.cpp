@@ -57,8 +57,3 @@ void Renderer::SetRotationAngles(float x, float y)
     gGlobalSpacePrm.m_rotationX = x;
     gGlobalSpacePrm.m_rotationY = y;
 }
-
-void Renderer::SetScale(float scale)
-{
-    gGlobalSpacePrm.mScale = scale;
-}

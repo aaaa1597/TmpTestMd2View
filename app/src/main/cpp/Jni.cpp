@@ -222,7 +222,9 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setModelPosi
 
 /* モデルデータ拡縮設定 */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setScale(JNIEnv *env, jobject thiz, jfloat scale) {
-    pRenderer->SetScale(scale);
+    gGlobalSpacePrm.mScale = scale;
+
+    return;
 }
 
 /* モデルデータ回転設定 */
