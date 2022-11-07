@@ -23,7 +23,7 @@ class MyRenderer : GLSurfaceView.Renderer {
 
     companion object {
         init {
-            System.loadLibrary("MD2Loader")
+            System.loadLibrary("md2loader")
         }
     }
 }
