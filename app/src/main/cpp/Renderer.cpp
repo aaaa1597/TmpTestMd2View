@@ -11,12 +11,12 @@ void Renderer::OnDrawFrame(std::map<std::string, Md2Model> &md2models)
 //    std::chrono::system_clock::time_point  start, end; // 型は auto で可
 //    start = std::chrono::system_clock::now(); // 計測開始時間
 
-    Md2Model *m_player = &md2models.at("female");
-    Md2Model *m_player2= &md2models.at("grunt");
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_player->Draw(gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
-    m_player2->Draw(gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
+//    Md2Model *m_player = &md2models.at("female");
+//    Md2Model *m_player2= &md2models.at("grunt");
+//
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    m_player->Draw(gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
+//    m_player2->Draw(gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey, gGlobalSpacePrm.mScale, gGlobalSpacePrm.m_view, gGlobalSpacePrm.m_projection, gGlobalSpacePrm.m_model);
 
 //    end = std::chrono::system_clock::now();
 //    double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count(); //処理に要した時間をミリ秒に変換

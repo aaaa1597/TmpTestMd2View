@@ -183,7 +183,24 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
 
 /* onDrawFrame */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(JNIEnv *env, jobject thiz) {
+//  __android_log_print(ANDROID_LOG_INFO, "aaaaa", "%s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     pRenderer->OnDrawFrame(gMd2Models);
+
+    Md2Obj::ArgType globalprm = {gGlobalSpacePrm.mMvpMat, gGlobalSpacePrm.mNormalMatrix, gGlobalSpacePrm.mScale, gGlobalSpacePrm.mRotatex, gGlobalSpacePrm.mRotatey};
+
+    /* 前回描画からの経過時間を算出 */
+    std::chrono::system_clock::time_point stime = std::chrono::system_clock::now();
+    float elapsedtimeMs = (float)std::chrono::duration_cast<std::chrono::microseconds>(stime-gPreStartTime).count() / 1000.0f;
+    gPreStartTime = stime;
+
+    /* Md2モデル描画 */
+    bool ret = Md2Obj::DrawModel(gMd2Models, globalprm, elapsedtimeMs);
+    if(!ret) {
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::DrawModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+        return;
+    }
+
+    return;
 }
 
 JNIEXPORT void JNICALL
