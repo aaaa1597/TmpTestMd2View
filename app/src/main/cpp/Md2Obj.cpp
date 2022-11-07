@@ -7,8 +7,6 @@
 #include "ShaderProgram.h"
 #include "GlobalSpaceObj.h"
 
-GlobalSpaceObj gGlobalSpacePrm;/* グローバル空間パラメータ */
-
 /* Md2モデル読込み(model読込,tex読込) */
 bool Md2Obj::LoadModel(std::map<std::string, Md2Model> &md2models) {
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "%s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
@@ -46,7 +44,7 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
 }
 
 /* Md2モデル描画 */
-bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj::ArgType &globalSpacePrm, float elapsedtimeMs) {
+bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj::ArgType &globalSpacePrm, const glm::mat4 &vpmat, float elapsedtimeMs) {
     const std::array<float, 16> &aMvpMat     = std::get<0>(globalSpacePrm);
     const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
 
@@ -55,8 +53,8 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, const Md2Obj:
 	Md2Model *m_player2= &md2models.at("grunt");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	m_player->Draw(gGlobalSpacePrm.m_vpmat, gGlobalSpacePrm.m_projection);
-	m_player2->Draw(gGlobalSpacePrm.m_vpmat, gGlobalSpacePrm.m_projection);
+	m_player->Draw(vpmat);
+	m_player2->Draw(vpmat);
 
 /* glEnable(GL_DEPTH_TEST); */
 //    GlObj::enable(GL_DEPTH_TEST);
@@ -96,7 +94,7 @@ Md2Model::~Md2Model()
 	glDeleteBuffers(1, &mVboId);
 }
 
-void Md2Model::Draw(const glm::mat4 &vpmat, const glm::mat4 &normalmat)
+void Md2Model::Draw(const glm::mat4 &vpmat)
 {
 	glEnable(GL_DEPTH_TEST);
 	assert(m_textureLoaded);

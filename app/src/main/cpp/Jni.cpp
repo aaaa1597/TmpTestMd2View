@@ -15,7 +15,7 @@ extern "C" {
 
 std::map<std::string, Md2Model>       gMd2Models;       /* Md2モデルデータ実体 */
 std::mutex                            gMutex;           /* onStart()完了待ちmutex */
-extern GlobalSpaceObj                        gGlobalSpacePrm;  /* グローバル空間パラメータ */
+GlobalSpaceObj                        gGlobalSpacePrm;  /* グローバル空間パラメータ */
 std::chrono::system_clock::time_point gPreStartTime;    /* 前回開始時刻 */
 
 /* onStart */
@@ -208,7 +208,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(
     gPreStartTime = stime;
 
     /* Md2モデル描画 */
-    bool ret = Md2Obj::DrawModel(gMd2Models, globalprm, elapsedtimeMs);
+    bool ret = Md2Obj::DrawModel(gMd2Models, globalprm, gGlobalSpacePrm.m_vpmat, elapsedtimeMs);
     if(!ret) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::DrawModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         return;

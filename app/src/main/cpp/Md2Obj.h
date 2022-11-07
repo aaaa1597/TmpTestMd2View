@@ -44,7 +44,7 @@ class Md2Model {
 public:
     ~Md2Model();
     // The frame parameter start at 0
-    void Draw(const glm::mat4 &view, const glm::mat4 &projection);
+    void Draw(const glm::mat4 &view);
     void SetPosition(float x, float y, float z);
 
 public:
@@ -98,7 +98,7 @@ public:
     static bool LoadModel(std::map<std::string, Md2Model> &md2models);
     static bool InitModel(std::map<std::string, Md2Model> &md2models);
     using ArgType = std::tuple<const std::array<float, 16> &, const std::array<float, 16> &>;
-    static bool DrawModel(std::map<std::string, Md2Model> &md2models, const ArgType &globalSpacePrm, float elapsedtimeMs);
+    static bool DrawModel(std::map<std::string, Md2Model> &md2models, const ArgType &globalSpacePrm, const glm::mat4 &vpmat, float elapsedtimeMs);
     static void setScale(std::map<std::string, Md2Model> &md2models, float scale);
     static void setRotate(std::map<std::string, Md2Model> &md2models, float x, float y);
 };
