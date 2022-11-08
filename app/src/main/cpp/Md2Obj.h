@@ -15,8 +15,6 @@
 #define MD2_IDENT   (('2'<<24) + ('P'<<16) + ('D'<<8) + 'I')    /* magic number "IDP2" or 844121161 */
 #define	MD2_VERSION 8                                           /* model version */
 
-class ShaderProgram;
-
 struct MdlData {
     int numTotalFrames;
     int numVertexsPerFrame;
@@ -36,8 +34,6 @@ struct MdlData {
     int state;
     float speed;
 };
-
-using RetShaderAttribs2 = std::tuple<bool, std::unordered_map<int, std::pair<int, int>>, GLuint, GLuint, GLuint, GLuint>;
 
 class Md2Model {
 public:
