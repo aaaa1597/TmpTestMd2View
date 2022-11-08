@@ -1,3 +1,5 @@
+#include <vector>
+#include <string>
 #include <map>
 #include <mutex>
 #include <chrono>
@@ -104,7 +106,7 @@ JNIEXPORT jboolean JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStart(
     /* 初期化 */
     bool ret = Md2Obj::LoadModel(gMd2Models);
     if(!ret) {
-        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::LoadModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+        __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::loadModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         return false;
     }
 
@@ -125,19 +127,11 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
     if(!ret)
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::InitModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
-    gGlobalSpacePrm.mCameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mCameraPos.x, gGlobalSpacePrm.mCameraPos.y, gGlobalSpacePrm.mCameraPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.mTargetPos = glm::vec3(0.0f, 0.0f, -20.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "targetPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mTargetPos.x, gGlobalSpacePrm.mTargetPos.y, gGlobalSpacePrm.mTargetPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.mUpPos = glm::vec3(1.0f, 0.0f, 0.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "up-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mUpPos.x, gGlobalSpacePrm.mUpPos.y, gGlobalSpacePrm.mUpPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     /* View行列を更新 */
-    gGlobalSpacePrm.mViewMat = glm::lookAt(gGlobalSpacePrm.mCameraPos, gGlobalSpacePrm.mCameraPos + gGlobalSpacePrm.mTargetPos, gGlobalSpacePrm.mUpPos);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[0](%f,%f,%f,%f) [1](%f,%f,%f,%f) [2](%f,%f,%f,%f) [3](%f,%f,%f,%f) %s %s(%d)"
-            , gGlobalSpacePrm.mViewMat[0][0], gGlobalSpacePrm.mViewMat[0][1], gGlobalSpacePrm.mViewMat[0][2], gGlobalSpacePrm.mViewMat[0][3]
-            , gGlobalSpacePrm.mViewMat[1][0], gGlobalSpacePrm.mViewMat[1][1], gGlobalSpacePrm.mViewMat[1][2], gGlobalSpacePrm.mViewMat[1][3]
-            , gGlobalSpacePrm.mViewMat[2][0], gGlobalSpacePrm.mViewMat[2][1], gGlobalSpacePrm.mViewMat[2][2], gGlobalSpacePrm.mViewMat[2][3]
-            , gGlobalSpacePrm.mViewMat[3][0], gGlobalSpacePrm.mViewMat[3][1], gGlobalSpacePrm.mViewMat[3][2], gGlobalSpacePrm.mViewMat[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.mCameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+    gGlobalSpacePrm.mTargetPos = glm::vec3(0.0f, 0.0f, -20.0f);
+    gGlobalSpacePrm.mUpPos     = glm::vec3(1.0f, 0.0f, 0.0f);
+    gGlobalSpacePrm.mViewMat   = glm::lookAt(gGlobalSpacePrm.mCameraPos, gGlobalSpacePrm.mCameraPos + gGlobalSpacePrm.mTargetPos, gGlobalSpacePrm.mUpPos);
     /* ViewProjection行列を更新 */
     gGlobalSpacePrm.mVpMat = gGlobalSpacePrm.mProjectionMat * gGlobalSpacePrm.mViewMat;
     /* View投影行列の変更を通知 */
@@ -177,7 +171,6 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
 /* onDrawFrame */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(JNIEnv *env, jobject thiz) {
 //  __android_log_print(ANDROID_LOG_INFO, "aaaaa", "%s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-//    Md2Obj::ArgType globalprm = {gGlobalSpacePrm.mMvpMat, gGlobalSpacePrm.mNormalMatrix};
 
     /* 前回描画からの経過時間を算出 */
     std::chrono::system_clock::time_point stime = std::chrono::system_clock::now();
@@ -185,7 +178,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(
     gPreStartTime = stime;
 
     /* Md2モデル描画 */
-    bool ret = Md2Obj::DrawModel(gMd2Models, /*globalprm, */gGlobalSpacePrm.mVpMat, elapsedtimeMs);
+    bool ret = Md2Obj::DrawModel(gMd2Models, gGlobalSpacePrm.mVpMat, elapsedtimeMs);
     if(!ret) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::DrawModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         return;
@@ -235,13 +228,13 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setModelPosi
 
 /* モデルデータ拡縮設定 */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setScale(JNIEnv *env, jobject thiz, jfloat scale) {
-    Md2Obj::setScale(gMd2Models, scale);
+    Md2Obj::SetScale(gMd2Models, scale);
     return;
 }
 
 /* モデルデータ回転設定 */
 JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_setRotate(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
-    Md2Obj::setRotate(gMd2Models, x, y);
+    Md2Obj::SetRotate(gMd2Models, x, y);
     return;
 }
 

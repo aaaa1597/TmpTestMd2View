@@ -13,11 +13,11 @@ bool Md2Obj::LoadModel(std::map<std::string, Md2Model> &md2models) {
     for(auto &[key, value] : md2models) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model load start (%s). %s %s(%d)", value.mName.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         /* MD2モデルLoad */
-        bool ret = value.LoadModel();
+        bool ret = value.loadModel();
         std::vector<char>().swap(value.mWkMd2BinData);
         if( !ret) return false;
         /* テクスチャLoad */
-        bool ret1 = value.LoadTexture();
+        bool ret1 = value.loadTexture();
         std::vector<char>().swap(value.mWkTexBinData);
         if( !ret1) return false;
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model and Texture LOADED(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
@@ -31,11 +31,11 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
     for(auto &[key, value] : md2models) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Model Init start (%s). %s %s(%d)", value.mName.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         /* テクスチャInit */
-        bool ret2 = value.InitTexture();
+        bool ret2 = value.initTexture();
         std::vector<char>().swap(value.mWkTexBinData);
         if( !ret2) return false;
       /* シェーダ初期化 */
-      bool ret3 = value.InitShaders();
+      bool ret3 = value.initShaders();
       if( !ret3) return false;
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Shader Init end(%s). %s %s(%d)", key.c_str(), __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     }
@@ -62,14 +62,14 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, /*const Md2Ob
     return true;
 }
 
-void Md2Obj::setRotate(std::map<std::string, Md2Model> &md2models, float x, float y) {
+void Md2Obj::SetRotate(std::map<std::string, Md2Model> &md2models, float x, float y) {
 	for(auto &[key, value] : md2models) {
 		value.setRotate(x, y);
 	}
 	return;
 }
 
-void Md2Obj::setScale(std::map<std::string, Md2Model> &md2models, float scale) {
+void Md2Obj::SetScale(std::map<std::string, Md2Model> &md2models, float scale) {
 	for(auto &[key, value] : md2models) {
 		value.setScale(scale);
 	}
@@ -80,7 +80,7 @@ Md2Model::~Md2Model()
 	glDeleteBuffers(1, &mVboId);
 }
 
-bool Md2Model::LoadModel() {
+bool Md2Model::loadModel() {
 	/* MD2ヘッダ */
 	md2header *header = (md2header*)mWkMd2BinData.data();
 
@@ -146,18 +146,18 @@ bool Md2Model::LoadModel() {
 	std::vector<char>().swap(mWkMd2BinData);
 
 	glm::mat4 model;
-    m_model = glm::translate(model, mPosition) *
-			glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
-			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
-	m_mvpmat = m_eXpiringVpmat * m_model;
+	mModelMat = glm::translate(model, mPosition) *
+				glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+				glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
+	mMvpMat = mExpiringVpMat * mModelMat;
 
 	return true;
 }
 
 /* AssetsからTextureデータを読込む */
-bool Md2Model::LoadTexture() {
+bool Md2Model::loadTexture() {
 	auto [retbool, w, h, rgbabindata] = TexObj::LoadTexture(mWkTexBinData);
 	if(retbool) {
 		mWkWidth = w;
@@ -177,7 +177,7 @@ bool Md2Model::LoadTexture() {
 }
 
 /* TextureデータをOpenGLで使えるようにする */
-bool Md2Model::InitTexture() {
+bool Md2Model::initTexture() {
     /* OpenGLのTexture初期化 */
     auto[boolret, texid] = GlObj::InitTexture(mWkWidth, mWkHeight, mWkRgbaData.data());
     if(boolret)
@@ -192,7 +192,7 @@ bool Md2Model::InitTexture() {
 }
 
 /* シェーダをOpenGLで使えるようにする */
-bool Md2Model::InitShaders() {
+bool Md2Model::initShaders() {
     /* シェーダ読込み */
     auto[retboot, progid] = GlObj::LoadShaders(mWkVshStrData, mWkFshStrData);
     if( !retboot) {
@@ -230,10 +230,10 @@ void Md2Model::drawModel(const glm::mat4 &vpmat) {
 
 	/* glUniformXxxxx() */
 	const std::array<float, 16> mvpmat44 = {
-			m_mvpmat[0][0],m_mvpmat[0][1],m_mvpmat[0][2],m_mvpmat[0][3],
-			m_mvpmat[1][0],m_mvpmat[1][1],m_mvpmat[1][2],m_mvpmat[1][3],
-			m_mvpmat[2][0],m_mvpmat[2][1],m_mvpmat[2][2],m_mvpmat[2][3],
-			m_mvpmat[3][0],m_mvpmat[3][1],m_mvpmat[3][2],m_mvpmat[3][3]
+		mMvpMat[0][0], mMvpMat[0][1], mMvpMat[0][2], mMvpMat[0][3],
+		mMvpMat[1][0], mMvpMat[1][1], mMvpMat[1][2], mMvpMat[1][3],
+		mMvpMat[2][0], mMvpMat[2][1], mMvpMat[2][2], mMvpMat[2][3],
+		mMvpMat[3][0], mMvpMat[3][1], mMvpMat[3][2], mMvpMat[3][3]
 	};
 	GlObj::setUniform(mProgramId, "mvpmat", mvpmat44);
 	GlObj::setUniform(mProgramId, "interpolation", minterpolate);
@@ -267,18 +267,18 @@ void Md2Model::setPosition(float x, float y, float z) {
 	mPosition = glm::vec3(x, y, z);
 
 	glm::mat4 model;
-	m_model = glm::translate(model, mPosition) *
-			  glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			  glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
-			  glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			  glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
-	m_mvpmat = m_eXpiringVpmat * m_model;
+	mModelMat = glm::translate(model, mPosition) *
+				glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+				glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
+	mMvpMat = mExpiringVpMat * mModelMat;
 //	/* mvpモデルの算出方法1 */
 //	const glm::mat4 &mvmat = view * model;
 //	const glm::mat4 &mvpmat = projection * mvmat;
 //	/* mvpモデルの算出方法2 */
 //	const glm::mat4 &vpmat = projection * view;
-//	const glm::mat4 &mvpmat = vpmat * m_model;
+//	const glm::mat4 &mvpmat = vpmat * mModelMat;
 }
 
 void Md2Model::setRotate(float x, float y) {
@@ -287,20 +287,20 @@ void Md2Model::setRotate(float x, float y) {
 
 	/* モデル行列更新 */
 	glm::mat4 model;
-	m_model = glm::translate(model, mPosition) *
-			  glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			  glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
-			  glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			  glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
+	mModelMat = glm::translate(model, mPosition) *
+				glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+				glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
 
 	/* モデルビュー投影行列更新 */
-	m_mvpmat = m_eXpiringVpmat * m_model;
+	mMvpMat = mExpiringVpMat * mModelMat;
 //	/* mvpモデルの算出方法1 */
 //	const glm::mat4 &mvmat = view * model;
 //	const glm::mat4 &mvpmat = projection * mvmat;
 //	/* mvpモデルの算出方法2 */
 //	const glm::mat4 &vpmat = projection * view;
-//	const glm::mat4 &mvpmat = vpmat * m_model;
+//	const glm::mat4 &mvpmat = vpmat * mModelMat;
 }
 
 void Md2Model::setScale(float scale) {
@@ -308,32 +308,32 @@ void Md2Model::setScale(float scale) {
 
 	/* モデル行列更新 */
 	glm::mat4 model;
-	m_model = glm::translate(model, mPosition) *
-			  glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			  glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
-			  glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
-			  glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
+	mModelMat = glm::translate(model, mPosition) *
+				glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
+				glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
 
 	/* モデルビュー投影行列更新 */
-	m_mvpmat = m_eXpiringVpmat * m_model;
+	mMvpMat = mExpiringVpMat * mModelMat;
 //	/* mvpモデルの算出方法1 */
 //	const glm::mat4 &mvmat = view * model;
 //	const glm::mat4 &mvpmat = projection * mvmat;
 //	/* mvpモデルの算出方法2 */
 //	const glm::mat4 &vpmat = projection * view;
-//	const glm::mat4 &mvpmat = vpmat * m_model;
+//	const glm::mat4 &mvpmat = vpmat * mModelMat;
 }
 
 void Md2Model::setVpMat(const glm::mat4 &vpmat) {
 	/* ビュー投影行列更新 */
-	m_eXpiringVpmat = vpmat;
+	mExpiringVpMat = vpmat;
 	/* モデルビュー投影行列更新 */
-	m_mvpmat		= vpmat * m_model;
+	mMvpMat		= vpmat * mModelMat;
 //	/* mvpモデルの算出方法1 */
 //	const glm::mat4 &mvmat = view * model;
 //	const glm::mat4 &mvpmat = projection * mvmat;
 //	/* mvpモデルの算出方法2 */
 //	const glm::mat4 &vpmat = projection * view;
-//	const glm::mat4 &mvpmat = vpmat * m_model;
+//	const glm::mat4 &mvpmat = vpmat * mModelMat;
 }
 

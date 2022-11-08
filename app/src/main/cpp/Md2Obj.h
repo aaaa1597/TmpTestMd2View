@@ -38,10 +38,10 @@ struct MdlData {
 class Md2Model {
 public:
     ~Md2Model();
-    bool LoadModel();   /* AssetsからMd2データを読込む */
-    bool LoadTexture(); /* AssetsからTextureデータを読込む */
-    bool InitTexture(); /* TextureデータをOpenGLで使えるようにする */
-    bool InitShaders(); /* シェーダをOpenGLで使えるようにする */
+    bool loadModel();   /* AssetsからMd2データを読込む */
+    bool loadTexture(); /* AssetsからTextureデータを読込む */
+    bool initTexture(); /* TextureデータをOpenGLで使えるようにする */
+    bool initShaders(); /* シェーダをOpenGLで使えるようにする */
     void drawModel(const glm::mat4 &vpmat);
     void setPosition(float x, float y, float z);
     void setRotate(float x, float y);
@@ -59,7 +59,6 @@ public:
     std::vector<char>   mWkRgbaData = {0};
     /* 描画に必要なデータ */
     MdlData                 mMdlData = {0};
-    glm::vec3               mPosition = glm::vec3(0.0f, 0.0f, -25.0f);
     /* アニメ関連 */
     std::unordered_map<int, std::pair<int, int>> mFrameIndices = {};
     int   mCurrentFrame = 0;
@@ -76,18 +75,20 @@ public:
     float mScale  = 1.0f;
     float mRotatex= 180.0f;
     float mRotatey= 0;
-    glm::mat4 m_model;
-    glm::mat4 m_eXpiringVpmat;  /* 死にかけのView投影行列(随時、最新化されるのを期待する) */
-    glm::mat4 m_mvpmat;         /* ModelView投影行列 */
+    glm::vec3 mPosition = glm::vec3(0.0f, 0.0f, -25.0f);
+    /* 行列 */
+    glm::mat4 mModelMat;
+    glm::mat4 mExpiringVpMat;  /* 死にかけのView投影行列(随時、最新化されるのを期待する) */
+    glm::mat4 mMvpMat;         /* ModelView投影行列 */
 };
 
 class Md2Obj {
 public:
     static bool LoadModel(std::map<std::string, Md2Model> &md2models);
     static bool InitModel(std::map<std::string, Md2Model> &md2models);
-    static bool DrawModel(std::map<std::string, Md2Model> &md2models, /*const ArgType &globalSpacePrm, */const glm::mat4 &vpmat, float elapsedtimeMs);
-    static void setScale(std::map<std::string, Md2Model> &md2models, float scale);
-    static void setRotate(std::map<std::string, Md2Model> &md2models, float x, float y);
+    static bool DrawModel(std::map<std::string, Md2Model> &md2models, const glm::mat4 &vpmat, float elapsedtimeMs);
+    static void SetScale(std::map<std::string, Md2Model> &md2models, float scale);
+    static void SetRotate(std::map<std::string, Md2Model> &md2models, float x, float y);
 };
 
 #endif //CPPMD2VIEWER_MD2OBJ_H
