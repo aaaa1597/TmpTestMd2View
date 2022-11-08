@@ -74,6 +74,7 @@ Md2Model::~Md2Model() {
 	std::vector<char>().swap(mWkMd2BinData);
 	std::vector<char>().swap(mWkTexBinData);
 	std::vector<char>().swap(mWkRgbaData);
+    std::unordered_map<int, std::pair<int, int>>().swap(mFrameIndices);
 }
 
 bool Md2Model::loadModel() {
@@ -160,15 +161,6 @@ bool Md2Model::loadTexture() {
 		mWkHeight= h;
 		mWkRgbaData = std::move(rgbabindata);
 	}
-	__android_log_print(ANDROID_LOG_INFO, "aaaaa", "w,h(%d,%d) %s %s(%d)", mWkWidth, mWkHeight, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-//	for(int lpct = 0; lpct < mWkRgbaData.size(); lpct+=16) {
-//		__android_log_print(ANDROID_LOG_INFO, "aaaaa", "[%d](%x,%x,%x,%x,%x,%x,%x,%x %x,%x,%x,%x,%x,%x,%x,%x) %s %s(%d)", lpct,
-//							mWkRgbaData[lpct+ 0],mWkRgbaData[lpct+ 1],mWkRgbaData[lpct+ 2],mWkRgbaData[lpct+ 3],
-//							mWkRgbaData[lpct+ 4],mWkRgbaData[lpct+ 5],mWkRgbaData[lpct+ 6],mWkRgbaData[lpct+ 7],
-//							mWkRgbaData[lpct+ 8],mWkRgbaData[lpct+ 9],mWkRgbaData[lpct+10],mWkRgbaData[lpct+11],
-//							mWkRgbaData[lpct+12],mWkRgbaData[lpct+13],mWkRgbaData[lpct+14],mWkRgbaData[lpct+15],
-//							__PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-//	}
 	return retbool;
 }
 
@@ -215,8 +207,6 @@ bool Md2Model::initShaders() {
 }
 
 bool Md2Model::drawModel(float elapsedtimeMs) {
-	GlObj::enable(GL_DEPTH_TEST);
-
 	/* glActiveTexture() → glBindTexture() */
 	GlObj::activeTexture(GL_TEXTURE0);
 	GlObj::bindTexture(GL_TEXTURE_2D, mTexId);
