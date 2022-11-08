@@ -42,7 +42,7 @@ public:
     bool loadTexture(); /* AssetsからTextureデータを読込む */
     bool initTexture(); /* TextureデータをOpenGLで使えるようにする */
     bool initShaders(); /* シェーダをOpenGLで使えるようにする */
-    void drawModel(const glm::mat4 &vpmat);
+    void drawModel();
     void setPosition(float x, float y, float z);
     void setRotate(float x, float y);
     void setScale(float scale);
@@ -86,7 +86,7 @@ class Md2Obj {
 public:
     static bool LoadModel(std::map<std::string, Md2Model> &md2models);
     static bool InitModel(std::map<std::string, Md2Model> &md2models);
-    static bool DrawModel(std::map<std::string, Md2Model> &md2models, const glm::mat4 &vpmat, float elapsedtimeMs);
+    static bool DrawModel(std::map<std::string, Md2Model> &md2models, float elapsedtimeMs);
     static void SetScale(std::map<std::string, Md2Model> &md2models, float scale);
     static void SetRotate(std::map<std::string, Md2Model> &md2models, float x, float y);
 };

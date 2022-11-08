@@ -178,7 +178,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(
     gPreStartTime = stime;
 
     /* Md2モデル描画 */
-    bool ret = Md2Obj::DrawModel(gMd2Models, gGlobalSpacePrm.mVpMat, elapsedtimeMs);
+    bool ret = Md2Obj::DrawModel(gMd2Models, elapsedtimeMs);
     if(!ret) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::DrawModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         return;

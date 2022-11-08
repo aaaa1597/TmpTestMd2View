@@ -43,13 +43,13 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
 }
 
 /* Md2モデル描画 */
-bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, /*const Md2Obj::ArgType &globalSpacePrm, */const glm::mat4 &vpmat, float elapsedtimeMs) {
+bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, float elapsedtimeMs) {
 //    const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
 
 	GlObj::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for(auto &[key, value] : md2models) {
-		value.drawModel(vpmat);
+		value.drawModel();
 	}
 	return true;
 
@@ -218,7 +218,7 @@ bool Md2Model::initShaders() {
     return true;
 }
 
-void Md2Model::drawModel(const glm::mat4 &vpmat) {
+void Md2Model::drawModel() {
 	GlObj::enable(GL_DEPTH_TEST);
 
 	/* glActiveTexture() → glBindTexture() */
