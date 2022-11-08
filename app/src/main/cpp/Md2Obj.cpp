@@ -53,14 +53,6 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, float elapsed
 		value.drawModel(elapsedtimeMs);
 	}
 	return true;
-
-/* glEnable(GL_DEPTH_TEST); */
-//    GlObj::enable(GL_DEPTH_TEST);
-//
-//    for(auto &[key, value] : md2models) {
-//        value.DrawModel(aMvpMat, amNormalMat, Scale, Rotatex, Rotatey, elapsedtimeMs);
-//    }
-    return true;
 }
 
 void Md2Obj::SetRotate(std::map<std::string, Md2Model> &md2models, float x, float y) {
@@ -76,9 +68,10 @@ void Md2Obj::SetScale(std::map<std::string, Md2Model> &md2models, float scale) {
 	}
 }
 
-Md2Model::~Md2Model()
-{
-	glDeleteBuffers(1, &mVboId);
+Md2Model::~Md2Model() {
+	std::vector<char>().swap(mWkMd2BinData);
+	std::vector<char>().swap(mWkTexBinData);
+	std::vector<char>().swap(mWkRgbaData);
 }
 
 bool Md2Model::loadModel() {
@@ -219,7 +212,7 @@ bool Md2Model::initShaders() {
     return true;
 }
 
-void Md2Model::drawModel(float elapsedtimeMs) {
+bool Md2Model::drawModel(float elapsedtimeMs) {
 	GlObj::enable(GL_DEPTH_TEST);
 
 	/* glActiveTexture() → glBindTexture() */
@@ -262,6 +255,8 @@ void Md2Model::drawModel(float elapsedtimeMs) {
 			mCurrentFrame++;
 	}
 	minterpolate += 0.1f;
+
+	return true;
 }
 
 void Md2Model::setPosition(float x, float y, float z) {

@@ -39,7 +39,7 @@ public:
     bool loadTexture(); /* AssetsからTextureデータを読込む */
     bool initTexture(); /* TextureデータをOpenGLで使えるようにする */
     bool initShaders(); /* シェーダをOpenGLで使えるようにする */
-    void drawModel(float elapsedtimeMs);
+    bool drawModel(float elapsedtimeMs);
     void setPosition(float x, float y, float z);
     void setRotate(float x, float y);
     void setScale(float scale);
@@ -47,6 +47,7 @@ public:
 
 public:
     std::string         mName = {0};
+    /* 一時データ領域 */
     std::vector<char>   mWkMd2BinData = {0};
     std::vector<char>   mWkTexBinData = {0};
     std::string         mWkVshStrData = {0};

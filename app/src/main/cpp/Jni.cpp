@@ -218,6 +218,8 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onStop(JNIEn
 //    for(unsigned int progid : progids) {
 //        GlObj::deleteProgram(progid);
 //    }
+//    /* 割当てバッファの解放 */
+//    glDeleteBuffers(1, &mVboId);
 
     return;
 }
