@@ -70,9 +70,9 @@ public:
     GLuint mNextPosAttrib = -1;
     GLuint mTexCoordAttrib= -1;
     /* 姿勢制御 */
-    float mScale  = 1.0f;
-    float mRotatex= 180.0f;
-    float mRotatey= 0;
+    float     mScale    = 1.0f;
+    float     mRotatex  = 180.0f;
+    float     mRotatey  = 0;
     glm::vec3 mPosition = glm::vec3(0.0f, 0.0f, -25.0f);
     /* 行列 */
     glm::mat4 mModelMat;
