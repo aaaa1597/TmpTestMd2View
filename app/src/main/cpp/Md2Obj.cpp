@@ -48,12 +48,12 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, /*const Md2Ob
 //    const std::array<float, 16> &aMvpMat     = std::get<0>(globalSpacePrm);
 //    const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
 
-	Md2Model *m_player = &md2models.at("female");
-	Md2Model *m_player2= &md2models.at("grunt");
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	m_player->Draw(vpmat);
-	m_player2->Draw(vpmat);
+	for(auto &[key, value] : md2models) {
+		value.Draw(vpmat);
+		value.Draw(vpmat);
+	}
+	return true;
 
 /* glEnable(GL_DEPTH_TEST); */
 //    GlObj::enable(GL_DEPTH_TEST);

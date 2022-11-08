@@ -140,6 +140,9 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
             , gGlobalSpacePrm.m_view[3][0], gGlobalSpacePrm.m_view[3][1], gGlobalSpacePrm.m_view[3][2], gGlobalSpacePrm.m_view[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     /* ViewProjection行列を更新 */
     gGlobalSpacePrm.m_vpmat = gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view;
+    /* View投影行列の変更を通知 */
+    for(auto &[key, value] : gMd2Models)
+        value.setVpMat(gGlobalSpacePrm.m_vpmat);
 
     gMd2Models.at("grunt").setPosition(0.0f, 6.5f, -25.0f);
 
@@ -164,6 +167,9 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
             , gGlobalSpacePrm.m_projection[3][0], gGlobalSpacePrm.m_projection[3][1], gGlobalSpacePrm.m_projection[3][2], gGlobalSpacePrm.m_projection[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     /* View投影行列を更新 */
     gGlobalSpacePrm.m_vpmat = gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view;
+    /* View投影行列の変更を通知 */
+    for(auto &[key, value] : gMd2Models)
+        value.setVpMat(gGlobalSpacePrm.m_vpmat);
 
     return;
 }
