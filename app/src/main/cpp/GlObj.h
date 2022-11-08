@@ -27,12 +27,17 @@ public:
                                          const std::vector<vertex> &vertexs, const std::vector<mesh> &polyIndexs, const std::vector<texstcoord> &sts);
     static void DeleteShaders(GLuint programId);
     static void setViewport(int x, int y, int width, int height);
+    static void clear(GLbitfield mask);
+    static void enable(GLenum cap);
     static void activeTexture(GLenum texture);
     static void bindTexture(GLenum target, GLuint textureid);
     static void useProgram(GLuint programId);
     static void deleteProgram(GLuint progid);
     static void setUniform(GLuint programId, const GLchar *name, const std::array<float, 16> &mat44);
     static void setUniform(GLuint programId, const GLchar *name, GLfloat valf);
+    static void bindBuffer(GLenum target, GLuint buffer);
+    static void vertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
+    static void drawArrays(GLenum mode, GLint first, GLsizei count);
     static void deleteTextures(GLsizei size, const GLuint *textures);
 
 private:

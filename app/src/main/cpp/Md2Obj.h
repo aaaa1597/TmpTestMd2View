@@ -75,7 +75,6 @@ public:
     float minterpolate = 0.0f;
     /* テクスチャ関連 */
     GLuint mTexId = -1;
-    bool m_textureLoaded = false;
     /* シェーダー関連 */
     GLuint mVboId         = -1;
     GLuint mProgramId     = -1;

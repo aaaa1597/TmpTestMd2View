@@ -47,9 +47,9 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, /*const Md2Ob
 //    const std::array<float, 16> &aMvpMat     = std::get<0>(globalSpacePrm);
 //    const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	GlObj::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	for(auto &[key, value] : md2models) {
-		value.Draw(vpmat);
 		value.Draw(vpmat);
 	}
 	return true;
@@ -83,13 +83,14 @@ Md2Model::~Md2Model()
 
 void Md2Model::Draw(const glm::mat4 &vpmat)
 {
-	glEnable(GL_DEPTH_TEST);
-	assert(m_textureLoaded);
+	/* TODO 移動予定 */
+	GlObj::enable(GL_DEPTH_TEST);
 
-	/* TODO 移動予定 glActiveTexture() → glBindTexture() */
+	/* glActiveTexture() → glBindTexture() */
 	GlObj::activeTexture(GL_TEXTURE0);
 	GlObj::bindTexture(GL_TEXTURE_2D, mTexId);
 
+	/* glUseProgram() */
 	GlObj::useProgram(mProgramId);
 
     /* glUniformXxxxx() */
@@ -102,13 +103,17 @@ void Md2Model::Draw(const glm::mat4 &vpmat)
     GlObj::setUniform(mProgramId, "mvpmat", mvpmat44);
     GlObj::setUniform(mProgramId, "interpolation", minterpolate);
 
-	auto count = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
+	/* glBindBuffer(有効化) */
+	GlObj::bindBuffer(GL_ARRAY_BUFFER, mVboId);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mVboId);
-	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
-	glVertexAttribPointer(mNextPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-	glVertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-	glDrawArrays(GL_TRIANGLES, mFrameIndices[mCurrentFrame].first, count);
+	/* glVertexAttribPointer()×3(現在頂点s,次頂点s,UV座標) */
+	GlObj::vertexAttribPointer(mCurPosAttrib  , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
+	GlObj::vertexAttribPointer(mNextPosAttrib , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	GlObj::vertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
+
+	auto count = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
+	GlObj::drawArrays(GL_TRIANGLES, mFrameIndices[mCurrentFrame].first, count);
+
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 
 	if(minterpolate >= 1.0f) {
@@ -228,7 +233,6 @@ bool Md2Model::InitTexture() {
     mWkWidth = 0;
     mWkHeight= 0;
 	std::vector<char>().swap(mWkRgbaData);
-	m_textureLoaded = true;
 
     return boolret;
 }

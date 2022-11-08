@@ -242,6 +242,14 @@ void GlObj::setViewport(int x, int y, int width, int height) {
     glViewport(x, y, width, height);
 }
 
+void GlObj::clear(GLbitfield mask) {
+    glClear(mask);
+}
+
+void GlObj::enable(GLenum cap) {
+    glEnable(cap);
+}
+
 void GlObj::activeTexture(GLenum texture) {
     glActiveTexture(texture);
 }
@@ -279,4 +287,16 @@ void GlObj::setUniform(GLuint programId, const GLchar *name, const std::array<fl
 void GlObj::setUniform(GLuint programId, const GLchar *name, GLfloat valf) {
     GLint uniformid = GlObj::getUniformId(programId, name);
     glUniform1f(uniformid, valf);
+}
+
+void GlObj::bindBuffer(GLenum target, GLuint buffer) {
+    glBindBuffer(target, buffer);
+}
+
+void GlObj::vertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
+    glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+}
+
+void GlObj::drawArrays(GLenum mode, GLint first, GLsizei count) {
+    glDrawArrays(mode, first, count);
 }
