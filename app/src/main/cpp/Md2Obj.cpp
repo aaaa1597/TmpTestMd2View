@@ -111,8 +111,9 @@ void Md2Model::Draw(const glm::mat4 &vpmat)
 	/* ↑これOK ここまで */
 	/* ↓これもOK ここから */
 //    const glm::mat4 &vpmat = projection * view;
-    m_shaderProgram.SetUniform(mProgramId, "mvpmat", vpmat * m_model);
+//	m_shaderProgram.SetUniform(mProgramId, "mvpmat", vpmat * m_model);
 	/* ↑これもOK ここまで */
+	m_shaderProgram.SetUniform(mProgramId, "mvpmat", m_mvpmat);
 
 	auto count = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
 	m_shaderProgram.SetUniform(mProgramId,"interpolation", minterpolate);
