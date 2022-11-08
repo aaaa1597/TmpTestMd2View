@@ -1,10 +1,9 @@
-#include <jni.h>
+#include <string>
 #include <android/log.h>
 #include "Md2Parts.h"
 #include "Md2Obj.h"
 #include "TexObj.h"
 #include "GlObj.h"
-#include "GlobalSpaceObj.h"
 #include "glm/gtc/matrix_transform.hpp"
 
 /* Md2モデル読込み(model読込,tex読込) */
@@ -47,7 +46,10 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
 bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, float elapsedtimeMs) {
 //    const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
 
+	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
 	GlObj::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    /* glEnable(GL_DEPTH_TEST); */
+    GlObj::enable(GL_DEPTH_TEST);
 
 	for(auto &[key, value] : md2models) {
 		value.drawModel(elapsedtimeMs);
