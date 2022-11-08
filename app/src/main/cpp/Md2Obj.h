@@ -43,22 +43,21 @@ using RetShaderAttribs2 = std::tuple<bool, std::unordered_map<int, std::pair<int
 class Md2Model {
 public:
     ~Md2Model();
-    // The frame parameter start at 0
-    void Draw(const glm::mat4 &view);
-    void SetPosition(float x, float y, float z);
 
 public:
-    bool LoadModel();
+    bool LoadModel();   /* AssetsからMd2データを読込む */
     bool LoadTexture(); /* AssetsからTextureデータを読込む */
     bool InitTexture(); /* TextureデータをOpenGLで使えるようにする */
     bool InitShaders(); /* シェーダをOpenGLで使えるようにする */
+    void setPosition(float x, float y, float z);
+    void setRotate(float x, float y);
+    void setScale(float scale);
+    void setVpMat(const glm::mat4 &vpmat);
 
 public:
     ShaderProgram       m_shaderProgram = {};
-
-public:
-    void setRotate(float x, float y);
-    void setScale(float scale);
+    // The frame parameter start at 0
+    void Draw(const glm::mat4 &view);
 
 public:
     std::string         mName = {0};
@@ -90,7 +89,8 @@ public:
     float mRotatex= 180.0f;
     float mRotatey= 0;
     glm::mat4 m_model;
-    glm::mat4 mvpmat;
+    glm::mat4 m_eXpiringVpmat;  /* 死にかけのView投影行列(随時、最新化されるのを期待する) */
+    glm::mat4 m_mvpmat;         /* ModelView投影行列 */
 };
 
 class Md2Obj {
@@ -98,7 +98,7 @@ public:
     static bool LoadModel(std::map<std::string, Md2Model> &md2models);
     static bool InitModel(std::map<std::string, Md2Model> &md2models);
     using ArgType = std::tuple<const std::array<float, 16> &, const std::array<float, 16> &>;
-    static bool DrawModel(std::map<std::string, Md2Model> &md2models, const ArgType &globalSpacePrm, const glm::mat4 &vpmat, float elapsedtimeMs);
+    static bool DrawModel(std::map<std::string, Md2Model> &md2models, /*const ArgType &globalSpacePrm, */const glm::mat4 &vpmat, float elapsedtimeMs);
     static void setScale(std::map<std::string, Md2Model> &md2models, float scale);
     static void setRotate(std::map<std::string, Md2Model> &md2models, float x, float y);
 };
