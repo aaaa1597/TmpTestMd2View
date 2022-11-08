@@ -125,24 +125,24 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCre
     if(!ret)
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::InitModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
 
-    gGlobalSpacePrm.m_camPos = glm::vec3(0.0f, 0.0f, 0.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_camPos.x, gGlobalSpacePrm.m_camPos.y, gGlobalSpacePrm.m_camPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.m_targetPos = glm::vec3(0.0f, 0.0f, -20.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "targetPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_targetPos.x, gGlobalSpacePrm.m_targetPos.y, gGlobalSpacePrm.m_targetPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
-    gGlobalSpacePrm.m_up = glm::vec3(1.0f, 0.0f, 0.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "up-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.m_up.x, gGlobalSpacePrm.m_up.y, gGlobalSpacePrm.m_up.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.mCameraPos = glm::vec3(0.0f, 0.0f, 0.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "camPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mCameraPos.x, gGlobalSpacePrm.mCameraPos.y, gGlobalSpacePrm.mCameraPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.mTargetPos = glm::vec3(0.0f, 0.0f, -20.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "targetPos-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mTargetPos.x, gGlobalSpacePrm.mTargetPos.y, gGlobalSpacePrm.mTargetPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.mUpPos = glm::vec3(1.0f, 0.0f, 0.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "up-vec(%f,%f,%f) %s %s(%d)", gGlobalSpacePrm.mUpPos.x, gGlobalSpacePrm.mUpPos.y, gGlobalSpacePrm.mUpPos.z, __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     /* View行列を更新 */
-    gGlobalSpacePrm.m_view = glm::lookAt(gGlobalSpacePrm.m_camPos, gGlobalSpacePrm.m_camPos + gGlobalSpacePrm.m_targetPos, gGlobalSpacePrm.m_up);
+    gGlobalSpacePrm.mViewMat = glm::lookAt(gGlobalSpacePrm.mCameraPos, gGlobalSpacePrm.mCameraPos + gGlobalSpacePrm.mTargetPos, gGlobalSpacePrm.mUpPos);
     __android_log_print(ANDROID_LOG_INFO, "aaaaa", "view-mat[0](%f,%f,%f,%f) [1](%f,%f,%f,%f) [2](%f,%f,%f,%f) [3](%f,%f,%f,%f) %s %s(%d)"
-            , gGlobalSpacePrm.m_view[0][0], gGlobalSpacePrm.m_view[0][1], gGlobalSpacePrm.m_view[0][2], gGlobalSpacePrm.m_view[0][3]
-            , gGlobalSpacePrm.m_view[1][0], gGlobalSpacePrm.m_view[1][1], gGlobalSpacePrm.m_view[1][2], gGlobalSpacePrm.m_view[1][3]
-            , gGlobalSpacePrm.m_view[2][0], gGlobalSpacePrm.m_view[2][1], gGlobalSpacePrm.m_view[2][2], gGlobalSpacePrm.m_view[2][3]
-            , gGlobalSpacePrm.m_view[3][0], gGlobalSpacePrm.m_view[3][1], gGlobalSpacePrm.m_view[3][2], gGlobalSpacePrm.m_view[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+            , gGlobalSpacePrm.mViewMat[0][0], gGlobalSpacePrm.mViewMat[0][1], gGlobalSpacePrm.mViewMat[0][2], gGlobalSpacePrm.mViewMat[0][3]
+            , gGlobalSpacePrm.mViewMat[1][0], gGlobalSpacePrm.mViewMat[1][1], gGlobalSpacePrm.mViewMat[1][2], gGlobalSpacePrm.mViewMat[1][3]
+            , gGlobalSpacePrm.mViewMat[2][0], gGlobalSpacePrm.mViewMat[2][1], gGlobalSpacePrm.mViewMat[2][2], gGlobalSpacePrm.mViewMat[2][3]
+            , gGlobalSpacePrm.mViewMat[3][0], gGlobalSpacePrm.mViewMat[3][1], gGlobalSpacePrm.mViewMat[3][2], gGlobalSpacePrm.mViewMat[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     /* ViewProjection行列を更新 */
-    gGlobalSpacePrm.m_vpmat = gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view;
+    gGlobalSpacePrm.mVpMat = gGlobalSpacePrm.mProjectionMat * gGlobalSpacePrm.mViewMat;
     /* View投影行列の変更を通知 */
     for(auto &[key, value] : gMd2Models)
-        value.setVpMat(gGlobalSpacePrm.m_vpmat);
+        value.setVpMat(gGlobalSpacePrm.mVpMat);
 
     gMd2Models.at("grunt").setPosition(0.0f, 6.5f, -25.0f);
 
@@ -159,17 +159,17 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onSurfaceCha
 
     /* 投影行列を更新 */
     float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-    gGlobalSpacePrm.m_projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
-    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "m_projection[0](%f,%f,%f,%f) [1](%f,%f,%f,%f) [2](%f,%f,%f,%f) [3](%f,%f,%f,%f) %s %s(%d)"
-            , gGlobalSpacePrm.m_projection[0][0], gGlobalSpacePrm.m_projection[0][1], gGlobalSpacePrm.m_projection[0][2], gGlobalSpacePrm.m_projection[0][3]
-            , gGlobalSpacePrm.m_projection[1][0], gGlobalSpacePrm.m_projection[1][1], gGlobalSpacePrm.m_projection[1][2], gGlobalSpacePrm.m_projection[1][3]
-            , gGlobalSpacePrm.m_projection[2][0], gGlobalSpacePrm.m_projection[2][1], gGlobalSpacePrm.m_projection[2][2], gGlobalSpacePrm.m_projection[2][3]
-            , gGlobalSpacePrm.m_projection[3][0], gGlobalSpacePrm.m_projection[3][1], gGlobalSpacePrm.m_projection[3][2], gGlobalSpacePrm.m_projection[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
+    gGlobalSpacePrm.mProjectionMat = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 100.0f);
+    __android_log_print(ANDROID_LOG_INFO, "aaaaa", "mProjectionMat[0](%f,%f,%f,%f) [1](%f,%f,%f,%f) [2](%f,%f,%f,%f) [3](%f,%f,%f,%f) %s %s(%d)"
+            , gGlobalSpacePrm.mProjectionMat[0][0], gGlobalSpacePrm.mProjectionMat[0][1], gGlobalSpacePrm.mProjectionMat[0][2], gGlobalSpacePrm.mProjectionMat[0][3]
+            , gGlobalSpacePrm.mProjectionMat[1][0], gGlobalSpacePrm.mProjectionMat[1][1], gGlobalSpacePrm.mProjectionMat[1][2], gGlobalSpacePrm.mProjectionMat[1][3]
+            , gGlobalSpacePrm.mProjectionMat[2][0], gGlobalSpacePrm.mProjectionMat[2][1], gGlobalSpacePrm.mProjectionMat[2][2], gGlobalSpacePrm.mProjectionMat[2][3]
+            , gGlobalSpacePrm.mProjectionMat[3][0], gGlobalSpacePrm.mProjectionMat[3][1], gGlobalSpacePrm.mProjectionMat[3][2], gGlobalSpacePrm.mProjectionMat[3][3], __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
     /* View投影行列を更新 */
-    gGlobalSpacePrm.m_vpmat = gGlobalSpacePrm.m_projection * gGlobalSpacePrm.m_view;
+    gGlobalSpacePrm.mVpMat = gGlobalSpacePrm.mProjectionMat * gGlobalSpacePrm.mViewMat;
     /* View投影行列の変更を通知 */
     for(auto &[key, value] : gMd2Models)
-        value.setVpMat(gGlobalSpacePrm.m_vpmat);
+        value.setVpMat(gGlobalSpacePrm.mVpMat);
 
     return;
 }
@@ -185,7 +185,7 @@ JNIEXPORT void JNICALL Java_com_tks_cppmd2viewer_Jni_00024Companion_onDrawFrame(
     gPreStartTime = stime;
 
     /* Md2モデル描画 */
-    bool ret = Md2Obj::DrawModel(gMd2Models, /*globalprm, */gGlobalSpacePrm.m_vpmat, elapsedtimeMs);
+    bool ret = Md2Obj::DrawModel(gMd2Models, /*globalprm, */gGlobalSpacePrm.mVpMat, elapsedtimeMs);
     if(!ret) {
         __android_log_print(ANDROID_LOG_INFO, "aaaaa", "Md2Obj::DrawModel()で失敗!! %s %s(%d)", __PRETTY_FUNCTION__, __FILE_NAME__, __LINE__);
         return;

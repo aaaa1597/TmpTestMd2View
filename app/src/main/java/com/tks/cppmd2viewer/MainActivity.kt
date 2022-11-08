@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
             // Don't let the object get too small or too large.
             scaleFactor = max(0.1f, min(scaleFactor, 5.0f))
-            Log.e(TAG, "scalefactor = $scaleFactor")
+//            Log.e(TAG, "scalefactor = $scaleFactor")
             Jni.setScale(scaleFactor)
 
             return true
