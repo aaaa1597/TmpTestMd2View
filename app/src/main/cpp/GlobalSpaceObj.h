@@ -1,8 +1,6 @@
 #ifndef CPPMD2VIEWER_GLOBALSPACEOBJ_H
 #define CPPMD2VIEWER_GLOBALSPACEOBJ_H
 
-#include <array>
-#include "MatObj.h"
 #include "glm/glm.hpp"
 
 class GlobalSpaceObj {
