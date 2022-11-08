@@ -44,13 +44,12 @@ bool Md2Obj::InitModel(std::map<std::string, Md2Model> &md2models) {
 
 /* Md2モデル描画 */
 bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, /*const Md2Obj::ArgType &globalSpacePrm, */const glm::mat4 &vpmat, float elapsedtimeMs) {
-//    const std::array<float, 16> &aMvpMat     = std::get<0>(globalSpacePrm);
 //    const std::array<float, 16> &amNormalMat = std::get<1>(globalSpacePrm);
 
 	GlObj::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for(auto &[key, value] : md2models) {
-		value.Draw(vpmat);
+		value.drawModel(vpmat);
 	}
 	return true;
 
@@ -79,51 +78,6 @@ void Md2Obj::setScale(std::map<std::string, Md2Model> &md2models, float scale) {
 Md2Model::~Md2Model()
 {
 	glDeleteBuffers(1, &mVboId);
-}
-
-void Md2Model::Draw(const glm::mat4 &vpmat)
-{
-	/* TODO 移動予定 */
-	GlObj::enable(GL_DEPTH_TEST);
-
-	/* glActiveTexture() → glBindTexture() */
-	GlObj::activeTexture(GL_TEXTURE0);
-	GlObj::bindTexture(GL_TEXTURE_2D, mTexId);
-
-	/* glUseProgram() */
-	GlObj::useProgram(mProgramId);
-
-    /* glUniformXxxxx() */
-	const std::array<float, 16> mvpmat44 = {
-		m_mvpmat[0][0],m_mvpmat[0][1],m_mvpmat[0][2],m_mvpmat[0][3],
-		m_mvpmat[1][0],m_mvpmat[1][1],m_mvpmat[1][2],m_mvpmat[1][3],
-		m_mvpmat[2][0],m_mvpmat[2][1],m_mvpmat[2][2],m_mvpmat[2][3],
-		m_mvpmat[3][0],m_mvpmat[3][1],m_mvpmat[3][2],m_mvpmat[3][3]
-	};
-    GlObj::setUniform(mProgramId, "mvpmat", mvpmat44);
-    GlObj::setUniform(mProgramId, "interpolation", minterpolate);
-
-	/* glBindBuffer(有効化) */
-	GlObj::bindBuffer(GL_ARRAY_BUFFER, mVboId);
-
-	/* glVertexAttribPointer()×3(現在頂点s,次頂点s,UV座標) */
-	GlObj::vertexAttribPointer(mCurPosAttrib  , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
-	GlObj::vertexAttribPointer(mNextPosAttrib , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
-	GlObj::vertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
-
-	auto count = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
-	GlObj::drawArrays(GL_TRIANGLES, mFrameIndices[mCurrentFrame].first, count);
-
-	glBindBuffer(GL_ARRAY_BUFFER, NULL);
-
-	if(minterpolate >= 1.0f) {
-		minterpolate = 0.0f;
-		if(mCurrentFrame >= (mFrameIndices.size()-1))
-			mCurrentFrame = 0;
-		else
-			mCurrentFrame++;
-	}
-	minterpolate += 0.1f;
 }
 
 bool Md2Model::LoadModel() {
@@ -262,6 +216,51 @@ bool Md2Model::InitShaders() {
     mTexCoordAttrib= retTexCoordAttrib;
 
     return true;
+}
+
+void Md2Model::drawModel(const glm::mat4 &vpmat) {
+	GlObj::enable(GL_DEPTH_TEST);
+
+	/* glActiveTexture() → glBindTexture() */
+	GlObj::activeTexture(GL_TEXTURE0);
+	GlObj::bindTexture(GL_TEXTURE_2D, mTexId);
+
+	/* glUseProgram() */
+	GlObj::useProgram(mProgramId);
+
+	/* glUniformXxxxx() */
+	const std::array<float, 16> mvpmat44 = {
+			m_mvpmat[0][0],m_mvpmat[0][1],m_mvpmat[0][2],m_mvpmat[0][3],
+			m_mvpmat[1][0],m_mvpmat[1][1],m_mvpmat[1][2],m_mvpmat[1][3],
+			m_mvpmat[2][0],m_mvpmat[2][1],m_mvpmat[2][2],m_mvpmat[2][3],
+			m_mvpmat[3][0],m_mvpmat[3][1],m_mvpmat[3][2],m_mvpmat[3][3]
+	};
+	GlObj::setUniform(mProgramId, "mvpmat", mvpmat44);
+	GlObj::setUniform(mProgramId, "interpolation", minterpolate);
+
+	/* glBindBuffer(有効化) */
+	GlObj::bindBuffer(GL_ARRAY_BUFFER, mVboId);
+
+	/* glVertexAttribPointer()×3(現在頂点s,次頂点s,UV座標) */
+	GlObj::vertexAttribPointer(mCurPosAttrib  , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));
+	GlObj::vertexAttribPointer(mNextPosAttrib , 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+	GlObj::vertexAttribPointer(mTexCoordAttrib, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(6 * sizeof(GLfloat)));
+
+	/* glDrawArrays() */
+	int sidx = mFrameIndices[mCurrentFrame].first;
+	int size = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
+	GlObj::drawArrays(GL_TRIANGLES, mFrameIndices[mCurrentFrame].first, size);
+
+	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+
+	if(minterpolate >= 1.0f) {
+		minterpolate = 0.0f;
+		if(mCurrentFrame >= (mFrameIndices.size()-1))
+			mCurrentFrame = 0;
+		else
+			mCurrentFrame++;
+	}
+	minterpolate += 0.1f;
 }
 
 void Md2Model::setPosition(float x, float y, float z) {
