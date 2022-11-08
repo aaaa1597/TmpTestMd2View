@@ -50,7 +50,7 @@ bool Md2Obj::DrawModel(std::map<std::string, Md2Model> &md2models, float elapsed
 	GlObj::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for(auto &[key, value] : md2models) {
-		value.drawModel();
+		value.drawModel(elapsedtimeMs);
 	}
 	return true;
 
@@ -219,7 +219,7 @@ bool Md2Model::initShaders() {
     return true;
 }
 
-void Md2Model::drawModel() {
+void Md2Model::drawModel(float elapsedtimeMs) {
 	GlObj::enable(GL_DEPTH_TEST);
 
 	/* glActiveTexture() → glBindTexture() */

@@ -39,7 +39,7 @@ public:
     bool loadTexture(); /* AssetsからTextureデータを読込む */
     bool initTexture(); /* TextureデータをOpenGLで使えるようにする */
     bool initShaders(); /* シェーダをOpenGLで使えるようにする */
-    void drawModel();
+    void drawModel(float elapsedtimeMs);
     void setPosition(float x, float y, float z);
     void setRotate(float x, float y);
     void setScale(float scale);
