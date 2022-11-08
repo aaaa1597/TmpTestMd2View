@@ -222,7 +222,7 @@ bool Md2Model::drawModel(float elapsedtimeMs) {
 		mMvpMat[3][0], mMvpMat[3][1], mMvpMat[3][2], mMvpMat[3][3]
 	};
 	GlObj::setUniform(mProgramId, "mvpmat", mvpmat44);
-	GlObj::setUniform(mProgramId, "interpolation", minterpolate);
+	GlObj::setUniform(mProgramId, "interpolate", minterpolate);
 
 	/* glBindBuffer(有効化) */
 	GlObj::bindBuffer(GL_ARRAY_BUFFER, mVboId);
@@ -235,10 +235,12 @@ bool Md2Model::drawModel(float elapsedtimeMs) {
 	/* glDrawArrays() */
 	int sidx = mFrameIndices[mCurrentFrame].first;
 	int size = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
-	GlObj::drawArrays(GL_TRIANGLES, mFrameIndices[mCurrentFrame].first, size);
+	GlObj::drawArrays(GL_TRIANGLES, sidx, size);
 
-	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+    /* glBindBuffer(無効化) */
+    GlObj::bindBuffer(GL_ARRAY_BUFFER, NULL);
 
+    /* 補完係数の計算 */
 	if(minterpolate >= 1.0f) {
 		minterpolate = 0.0f;
 		if(mCurrentFrame >= (mFrameIndices.size()-1))
