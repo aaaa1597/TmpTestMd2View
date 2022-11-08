@@ -10,6 +10,7 @@
 #include "Md2Obj.h"
 #include "GlObj.h"
 #include "GlobalSpaceObj.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 #ifdef __cplusplus
 extern "C" {

@@ -5,12 +5,9 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <tuple>
 #include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
 #include "Md2Parts.h"
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
 #define MD2_IDENT   (('2'<<24) + ('P'<<16) + ('D'<<8) + 'I')    /* magic number "IDP2" or 844121161 */
 #define	MD2_VERSION 8                                           /* model version */

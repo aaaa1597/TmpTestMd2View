@@ -5,6 +5,7 @@
 #include "TexObj.h"
 #include "GlObj.h"
 #include "GlobalSpaceObj.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 /* Md2モデル読込み(model読込,tex読込) */
 bool Md2Obj::LoadModel(std::map<std::string, Md2Model> &md2models) {
