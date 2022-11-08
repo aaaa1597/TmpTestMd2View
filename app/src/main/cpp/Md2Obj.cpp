@@ -4,7 +4,6 @@
 #include "Md2Obj.h"
 #include "TexObj.h"
 #include "GlObj.h"
-#include "ShaderProgram.h"
 #include "GlobalSpaceObj.h"
 
 /* Md2モデル読込み(model読込,tex読込) */
@@ -91,32 +90,19 @@ void Md2Model::Draw(const glm::mat4 &vpmat)
 	GlObj::activeTexture(GL_TEXTURE0);
 	GlObj::bindTexture(GL_TEXTURE_2D, mTexId);
 
-//	glm::mat4 model;
-//    m_model = glm::translate(model, mPosition) *
-//			glm::rotate(model, glm::radians(mRotatey), glm::vec3(0.0f, 1.0f, 0.0f)) *
-//			glm::rotate(model, glm::radians(mRotatex), glm::vec3(1.0f, 0.0f, 0.0f)) *
-//			glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)) *
-//			glm::scale(model, glm::vec3(0.3 * mScale, 0.3 * mScale, 0.3 * mScale));
-
 	GlObj::useProgram(mProgramId);
-//	m_shaderProgram.Use();
-//	m_shaderProgram->SetUniform("model", model);
-//	m_shaderProgram->SetUniform("view", view);
-//	m_shaderProgram->SetUniform("projection", projection);
-//	m_shaderProgram->SetUniform("modelView", view * model);
 
-	/* ↓これOK ここから */
-//    const glm::mat4 &vmmat = view * model;
-//    m_shaderProgram->SetUniform("mvpmat", projection * vmmat);
-	/* ↑これOK ここまで */
-	/* ↓これもOK ここから */
-//    const glm::mat4 &vpmat = projection * view;
-//	m_shaderProgram.SetUniform(mProgramId, "mvpmat", vpmat * m_model);
-	/* ↑これもOK ここまで */
-	m_shaderProgram.SetUniform(mProgramId, "mvpmat", m_mvpmat);
+    /* glUniformXxxxx() */
+	const std::array<float, 16> mvpmat44 = {
+		m_mvpmat[0][0],m_mvpmat[0][1],m_mvpmat[0][2],m_mvpmat[0][3],
+		m_mvpmat[1][0],m_mvpmat[1][1],m_mvpmat[1][2],m_mvpmat[1][3],
+		m_mvpmat[2][0],m_mvpmat[2][1],m_mvpmat[2][2],m_mvpmat[2][3],
+		m_mvpmat[3][0],m_mvpmat[3][1],m_mvpmat[3][2],m_mvpmat[3][3]
+	};
+    GlObj::setUniform(mProgramId, "mvpmat", mvpmat44);
+    GlObj::setUniform(mProgramId, "interpolation", minterpolate);
 
 	auto count = mFrameIndices[mCurrentFrame].second - mFrameIndices[mCurrentFrame].first + 1;
-	m_shaderProgram.SetUniform(mProgramId,"interpolation", minterpolate);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVboId);
 	glVertexAttribPointer(mCurPosAttrib, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid *)(0));

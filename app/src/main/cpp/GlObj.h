@@ -31,11 +31,14 @@ public:
     static void bindTexture(GLenum target, GLuint textureid);
     static void useProgram(GLuint programId);
     static void deleteProgram(GLuint progid);
+    static void setUniform(GLuint programId, const GLchar *name, const std::array<float, 16> &mat44);
+    static void setUniform(GLuint programId, const GLchar *name, GLfloat valf);
     static void deleteTextures(GLsizei size, const GLuint *textures);
 
 private:
     static bool CheckCompileErrors(GLuint sid, EShaderType type);
     static bool CheckLinkError(GLuint programId);
     static std::map<std::string, GLint>     mUniformLocations;
+    static GLint getUniformId(GLuint programId, const GLchar *name);
 };
 #endif //CPPMD2VIEWER_GLOBJ_H

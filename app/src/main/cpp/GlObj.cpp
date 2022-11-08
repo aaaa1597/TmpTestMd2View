@@ -261,3 +261,22 @@ void GlObj::useProgram(GLuint programId) {
 void GlObj::deleteProgram(GLuint progid) {
     glDeleteProgram(progid);
 }
+
+GLint GlObj::getUniformId(GLuint programId, const GLchar *name) {
+    auto itr = mUniformLocations.find(name);
+    if(itr == mUniformLocations.end()) {
+        mUniformLocations[name] = glGetUniformLocation(programId, name);
+    }
+    GLint uniformid = mUniformLocations[name];
+    return uniformid;
+}
+
+void GlObj::setUniform(GLuint programId, const GLchar *name, const std::array<float, 16> &mat44) {
+    GLint uniformid = GlObj::getUniformId(programId, name);
+    glUniformMatrix4fv(uniformid, 1, GL_FALSE, &(mat44[0]));
+}
+
+void GlObj::setUniform(GLuint programId, const GLchar *name, GLfloat valf) {
+    GLint uniformid = GlObj::getUniformId(programId, name);
+    glUniform1f(uniformid, valf);
+}
